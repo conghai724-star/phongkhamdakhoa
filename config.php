@@ -1,0 +1,50 @@
+<?php
+/**
+ * Project: xvn.
+ * File: config.php.
+
+ */
+ 
+session_start();
+date_default_timezone_set('Asia/Ho_Chi_Minh');
+//=============== Custom configuration ==================//
+define('DB_NAME', 'phongkha697b_phongkhamcdkontum'); //database name
+define('DB_USER', 'root'); //database user
+define('DB_PASSWORD', ''); //database password
+define('DB_HOST', '127.0.0.1:3307'); //sql server
+define('DB_PORT', '3307');
+
+/*** define mailer ***/
+define('MAIL_PROTOCOL', 'SMTP');
+define('MAIL_HOST', 'smtp.zoho.com');
+define('MAIL_ACC', 'support@mmexpress.vn');
+define('MAIL_PASS', '');
+define('MAIL_PORT', 587);
+define('MAIL_AUTH', true);
+define('MAIL_SECURE', 'tls');
+
+/*** define Xiao SMS ***/
+define('SMS_API_KEY', 'key-c4a8d21f56a2827fa24a41b3a63dcbb7');
+define('SMS_API_SECRECT', 'C09E8A7C0D6A47BA117A3964A94EB8');
+
+
+/*** define Theme ***/
+
+define('ThemeMaster', 'page'); //Replace xpanel by your theme's name
+define('AdminThemeMaster', 'sms'); //Replace xpanel by your admin theme's name
+
+/*** define site path ***/
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+$siteScheme = $isHttps ? 'https://' : 'http://';
+$siteHost = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+defined('XC_URL') || define('XC_URL', $siteScheme . $siteHost . '/phongkhamcdkontum.com.vn');
+$siteurl = XC_URL;
+/*** template path ***/
+$template_path = XC_URL.'/template/'.ThemeMaster; //Warning: Don't change here
+$admintemplate_path = XC_URL.'/template/'.AdminThemeMaster; //Warning: Don't change here
+$upload_path = XC_URL.'/uploads';
+$image_path = XC_URL.'/uploads/images';
+
+/*** Set Application Name ***/
+$app_name = 'Phong kham va nha thuoc CDKT';
+?>
