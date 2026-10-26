@@ -4,7 +4,7 @@ Class pageController extends baseController
     public function customerprofile()
     {
         global $db;
-        if (empty($_SESSION['customer']['id'])) {
+        if (empty($_SESSION['customer']['id']) || empty($_SESSION['customer']['zalo'])) {
             header('Location: '.XC_URL.'/login'); exit;
         }
         $id = (int)$_SESSION['customer']['id'];
@@ -22,9 +22,24 @@ Class pageController extends baseController
     public function zalocallback()
     {
         header('Cache-Control: no-store');
-        $query = !empty($_GET) ? '?' . http_build_query($_GET) : '';
-        header('Location: ' . XC_URL . '/loginApi/zalo_callback' . $query);
+        header('Referrer-Policy: no-referrer');
+        $flow = isset($_SESSION['zalo_oauth']) ? $_SESSION['zalo_oauth'] : null;
+        $state = isset($_GET['state']) ? $_GET['state'] : '';
+        if ($flow && is_string($state) && hash_equals($flow['state'], $state) && time() - $flow['created'] <= 600) {
+            $_SESSION['zalo_callback'] = array('state' => $state, 'code' => isset($_GET['code']) && is_string($_GET['code']) && strlen($_GET['code']) <= 4096 ? $_GET['code'] : '', 'error' => !empty($_GET['error']));
+        } else {
+            unset($_SESSION['zalo_callback']);
+            $_SESSION['zalo_login_error'] = 'Phiên đăng nhập Zalo không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.';
+        }
+        $page = '/login';
+        header('Location: '.XC_URL.$page);
         exit;
+    }
+
+    public function privacypolicy()
+    {
+        $this->view->data['pagetitle'] = 'Chính sách quyền riêng tư & Bảo mật dữ liệu';
+        $this->view->show('privacy-policy');
     }
 	public function index()
 	{

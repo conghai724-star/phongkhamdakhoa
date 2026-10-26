@@ -134,7 +134,7 @@ private function getController() {
 	{
 		/*** get the parts of the route ***/
 		$parts = explode('/', $route);
-		if($parts[0] == "login" || $parts[0] == "dang-nhap.html" || $parts[0] == "dang-nhap")
+		if($parts[0] == "login")
 		{
 			// var_dump(222);
 			$this->controller = "member";
@@ -148,19 +148,6 @@ private function getController() {
 					$args[$k++] = $parts[$i]; 
 				$this->args = $args;
 			} 
-		}elseif($parts[0] == "register" || $parts[0] == "dang-ky.html" || $parts[0] == "dang-ky")
-		{
-			$this->controller = "member";
-			$this->action = "register";
-			if(isset( $parts[1]))
-			{
-				$count_args = count($parts);
-				$k = 1;
-				$args = array();
-				for($i = 1; $i < $count_args; $i++)
-					$args[$k++] = $parts[$i]; 
-				$this->args = $args;
-			}
 		}elseif($parts[0] == "dich-vu")
 		{
 			// echo $parts[0];
@@ -268,6 +255,19 @@ private function getController() {
 			$this->controller = "page";
 			$this->action = "introduce";
 			if(isset( $parts[1]))
+			{
+				$count_args = count($parts);
+				$k = 1;
+				$args = array();
+				for($i = 1; $i < $count_args; $i++)
+					$args[$k++] = $parts[$i]; 
+				$this->args = $args;
+			}
+		}elseif($parts[0] == "chinh-sach-bao-mat.html" || $parts[0] == "chinh-sach-bao-mat" || $parts[0] == "privacy-policy.html" || $parts[0] == "privacy-policy")
+		{
+			$this->controller = "page";
+			$this->action = "privacypolicy";
+			if(isset($parts[1]))
 			{
 				$count_args = count($parts);
 				$k = 1;
