@@ -22,7 +22,7 @@
 <script>
 $(function () {
     var busy = false;
-    function toast(message, ok) { Swal.fire({toast:true, position:'bottom-end', icon:ok ? 'success':'error', title:message, showConfirmButton:false, timer:4000}); }
+    function toast(message, ok) { Swal.fire({position:'center', icon:ok ? 'success':'error', title:message, showConfirmButton:!ok, confirmButtonText:'Đóng', timer:ok ? 2000 : undefined, timerProgressBar:ok}); }
     $('#zalo-config-form').on('submit', function (event) {
         event.preventDefault();
         if (busy || !this.reportValidity()) return;

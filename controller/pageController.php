@@ -4,11 +4,11 @@ Class pageController extends baseController
     public function customerprofile()
     {
         global $db;
-        if (empty($_SESSION['customer']['id']) || empty($_SESSION['customer']['zalo'])) {
+        if (empty($_SESSION['customer']['id'])) {
             header('Location: '.XC_URL.'/login'); exit;
         }
         $id = (int)$_SESSION['customer']['id'];
-        $db->query("SELECT user_fullname, user_phone FROM hicrm_users WHERE id = ".$id." AND user_status = 1 LIMIT 1");
+        $db->query("SELECT user_fullname, user_phone, user_address, loyalty_points FROM hicrm_users WHERE id = ".$id." AND user_status = 1 LIMIT 1");
         $customer = $db->fetch_object(true);
         if (!$customer) {
             unset($_SESSION['customer']); header('Location: '.XC_URL.'/login'); exit;
@@ -36,6 +36,108 @@ Class pageController extends baseController
         exit;
     }
 
+    public function thankyou()
+    {
+        global $db;
+        $isDemo = isset($_GET['demo']) || isset($_GET['preview']);
+        if ($isDemo) {
+            $order = (object)array(
+                'id' => 999,
+                'user_id' => 1,
+                'fullname' => 'Nguyễn Văn An (Khách hàng mẫu)',
+                'phone' => '0912 345 678',
+                'created_at' => date('Y-m-d H:i:s'),
+                'ship_method' => 'Giao hàng tận nơi',
+                'address' => 'Số 123 Phan Đình Phùng, TP Kon Tum',
+                'payment_method' => 'Chuyển khoản (Mã QR Online)',
+                'subtotal' => 150000,
+                'shipping_fee' => 20000,
+                'voucher_code' => 'KONTUM10',
+                'voucher_discount' => 15000,
+                'points_used' => 5,
+                'points_discount' => 5000,
+                'total_amount' => 150000,
+                'points_earned' => 15
+            );
+            $medicines = array(
+                array('name' => 'Paracetamol 500mg (Hạ sốt, giảm đau)', 'spec' => 'Hộp 10 vỉ x 10 viên', 'qty' => 2, 'note' => 'Uống sau ăn khi sốt trên 38.5 độ'),
+                array('name' => 'Bông y tế Bạch Tuyết tiệt trùng 25g', 'spec' => 'Gói 25g', 'qty' => 1, 'note' => '')
+            );
+            $this->view->data['order'] = $order;
+            $this->view->data['medicines'] = $medicines;
+            $this->view->data['isOnlinePayment'] = true;
+            $this->view->data['userPoints'] = 120;
+            $this->view->data['pagetitle'] = 'Xem thử tích điểm đơn hàng - Nhà thuốc CĐ Kon Tum';
+            $this->view->show('thankyou');
+            return;
+        }
+
+        $orderId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        if ($orderId <= 0 && !empty($_SESSION['last_order_id'])) {
+            $orderId = (int)$_SESSION['last_order_id'];
+        }
+
+        if ($orderId <= 0) {
+            header('Location: ' . XC_URL . '/nha-thuoc.html');
+            exit;
+        }
+
+        $db->query("SELECT * FROM booking_internal WHERE id = '" . $orderId . "' LIMIT 1");
+        $order = $db->fetch_object(true);
+
+        if (!$order) {
+            header('Location: ' . XC_URL . '/nha-thuoc.html');
+            exit;
+        }
+
+        // Bảo mật quyền xem đơn: khớp Session đơn vừa đặt HOẶC khớp user_id đang đăng nhập
+        $loggedInUserId = !empty($_SESSION['customer']['id']) ? (int)$_SESSION['customer']['id'] : (!empty($_SESSION['user']['id']) ? (int)$_SESSION['user']['id'] : 0);
+        $isOwnerSession = (!empty($_SESSION['last_order_id']) && (int)$_SESSION['last_order_id'] === $orderId);
+        $isOwnerAccount = ($loggedInUserId > 0 && (int)$order->user_id === $loggedInUserId);
+
+        if (!$isOwnerSession && !$isOwnerAccount) {
+            header('Location: ' . XC_URL . '/nha-thuoc.html');
+            exit;
+        }
+
+        // Parse danh sách thuốc
+        $medicines = array();
+        if (!empty($order->medicines)) {
+            $decoded = json_decode($order->medicines, true);
+            if (is_array($decoded)) {
+                $medicines = $decoded;
+            }
+        }
+
+        // Kiểm tra thanh toán online hay offline
+        // Online: Chuyển khoản, MoMo, VNPay, ZaloPay
+        $onlinePaymentMethods = array('Chuyển khoản', 'Mã QR / Chuyển khoản', 'Chuyển khoản ngân hàng', 'MoMo', 'VNPay', 'ZaloPay', 'Thanh toán online');
+        $isOnlinePayment = false;
+        foreach ($onlinePaymentMethods as $m) {
+            if (stripos($order->payment_method, $m) !== false) {
+                $isOnlinePayment = true;
+                break;
+            }
+        }
+
+        // Lấy số dư điểm tích lũy hiện tại của tài khoản
+        $userPoints = 0;
+        if (!empty($order->user_id)) {
+            $db->query("SELECT loyalty_points FROM hicrm_users WHERE id = '" . (int)$order->user_id . "' LIMIT 1");
+            $userRow = $db->fetch_object(true);
+            if ($userRow) {
+                $userPoints = max(0, (int)$userRow->loyalty_points);
+            }
+        }
+
+        $this->view->data['order'] = $order;
+        $this->view->data['medicines'] = $medicines;
+        $this->view->data['isOnlinePayment'] = $isOnlinePayment;
+        $this->view->data['userPoints'] = $userPoints;
+        $this->view->data['pagetitle'] = 'Đặt hàng thành công - Nhà thuốc CĐ Kon Tum';
+        $this->view->show('thankyou');
+    }
+
     public function privacypolicy()
     {
         $this->view->data['pagetitle'] = 'Chính sách quyền riêng tư & Bảo mật dữ liệu';
@@ -50,28 +152,79 @@ Class pageController extends baseController
 		var_dump($para);
 	}
 	public function introduce($para){
-		$id = $para[1];
-	
-		$id = explode("-",$id);
-		$id = $id[0];
+		$rawId = isset($para[1]) ? $para[1] : '';
+		$id = 0;
+		if($rawId !== ''){
+			$parts = explode("-", $rawId);
+			$id = (int)$parts[0];
+		}
 		global $db;
-		$db->query("SELECT * FROM hicrm_categories WHERE category_parent = 1 AND category_status NOT IN(99) ORDER BY category_orderby ASC");
-		$category = $db->fetch_object();
-		$db->query("SELECT * FROM hicrm_introduce WHERE id= '".$id."'");
-		$introduce = $db->fetch_object(true);	
-		$db->query("SELECT * FROM hicrm_categories WHERE category_parent = 4 AND category_status NOT IN(99) ORDER BY category_orderby ASC");
-		$pro = $db->fetch_object();
-		$em = $this->helper->get_doctors();
+		if($id > 0){
+			$db->query("SELECT * FROM hicrm_introduce WHERE id = '".$id."' AND (introduce_status IS NULL OR introduce_status NOT IN (99)) LIMIT 1");
+			$introduce = $db->fetch_object(true);
+		}
+		if(empty($introduce)){
+			// Mặc định lấy bài giới thiệu đầu tiên (ID 1: Về chúng tôi)
+			$db->query("SELECT * FROM hicrm_introduce WHERE (introduce_status IS NULL OR introduce_status NOT IN (99)) AND (introduce_category IN (2, 3, 4, 5, 8) OR id IN (1, 2, 3, 4, 5)) ORDER BY introduce_orderby ASC, id ASC LIMIT 1");
+			$introduce = $db->fetch_object(true);
+			if($introduce){
+				$id = (int)$introduce->id;
+			}
+		}
+
+		// Lấy danh sách bài viết thuộc mục Giới thiệu hiển thị sidebar
+		$db->query("SELECT id, introduce_name, introduce_category, introduce_orderby FROM hicrm_introduce WHERE (introduce_status IS NULL OR introduce_status NOT IN (99)) AND (introduce_category IN (2, 3, 4, 5, 8) OR id IN (1, 2, 3, 4, 5)) ORDER BY introduce_orderby ASC, id ASC");
+		$policy_items = $db->fetch_object();
+		if(empty($policy_items)){
+			$db->query("SELECT id, introduce_name, introduce_category, introduce_orderby FROM hicrm_introduce WHERE (introduce_status IS NULL OR introduce_status NOT IN (99)) ORDER BY introduce_orderby ASC, id ASC");
+			$policy_items = $db->fetch_object();
+		}
+
 		$this->view->data['introduce'] = $introduce;
-		$this->view->data['employee'] = $em;
-		$this->view->data['product'] = $pro;
-		$events = $this->helper->get_events('4');
-		$this->view->data['events'] = $events;
-
-		// var_dump($introduce->category_name);
-
+		$this->view->data['policy_items'] = $policy_items;
 		$this->view->data['id'] = $id;
+		$this->view->data['pagetitle'] = (!empty($introduce->introduce_name) ? $introduce->introduce_name . ' - ' : '') . 'Giới thiệu';
 		$this->view->show("gioithieu");
+	}
+
+	public function chinhsach($para){
+		$rawId = isset($para[1]) ? $para[1] : '';
+		$id = 0;
+		if($rawId !== ''){
+			$parts = explode("-", $rawId);
+			$id = (int)$parts[0];
+		}
+		global $db;
+		if($id > 0){
+			$db->query("SELECT * FROM hicrm_introduce WHERE id = '".$id."' AND (introduce_status IS NULL OR introduce_status NOT IN (99)) LIMIT 1");
+			$introduce = $db->fetch_object(true);
+		}
+		if(empty($introduce)){
+			// Mặc định lấy bài chính sách đầu tiên (ID 8: Chính sách đổi trả hoặc ID 6: Bán hàng hoặc nhóm 9)
+			$db->query("SELECT * FROM hicrm_introduce WHERE (introduce_status IS NULL OR introduce_status NOT IN (99)) AND (introduce_category = 9 OR id IN (6, 8) OR introduce_category NOT IN (1, 2, 3, 4, 5, 8, 10)) ORDER BY introduce_orderby ASC, id ASC LIMIT 1");
+			$introduce = $db->fetch_object(true);
+			if(empty($introduce)){
+				$db->query("SELECT * FROM hicrm_introduce WHERE (introduce_status IS NULL OR introduce_status NOT IN (99)) ORDER BY introduce_orderby ASC, id ASC LIMIT 1");
+				$introduce = $db->fetch_object(true);
+			}
+			if($introduce){
+				$id = (int)$introduce->id;
+			}
+		}
+
+		// Lấy danh sách các bài viết thuộc mục Chính sách hiển thị sidebar
+		$db->query("SELECT id, introduce_name, introduce_category, introduce_orderby FROM hicrm_introduce WHERE (introduce_status IS NULL OR introduce_status NOT IN (99)) AND (introduce_category = 9 OR id IN (6, 8) OR introduce_category NOT IN (1, 2, 3, 4, 5, 8, 10)) ORDER BY introduce_orderby ASC, id ASC");
+		$policy_items = $db->fetch_object();
+		if(empty($policy_items)){
+			$db->query("SELECT id, introduce_name, introduce_category, introduce_orderby FROM hicrm_introduce WHERE (introduce_status IS NULL OR introduce_status NOT IN (99)) ORDER BY introduce_orderby ASC, id ASC");
+			$policy_items = $db->fetch_object();
+		}
+
+		$this->view->data['introduce'] = $introduce;
+		$this->view->data['policy_items'] = $policy_items;
+		$this->view->data['id'] = $id;
+		$this->view->data['pagetitle'] = (!empty($introduce->introduce_name) ? $introduce->introduce_name . ' - ' : '') . 'Chính sách nhà thuốc';
+		$this->view->show("chinhsach");
 	}
 	public function demo()
 	{

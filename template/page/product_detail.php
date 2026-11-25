@@ -42,8 +42,118 @@ $detailDisplayPrice = $finalPrice > 0 ? number_format($finalPrice, 0, ',', '.') 
         .pd-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;border-radius:24px;font-size:14.5px;font-weight:600;border:0;cursor:pointer;text-decoration:none;box-shadow:0 3px 12px rgba(11,99,246,.2);transition:all .2s ease}
         .pd-btn-primary{background:linear-gradient(135deg,#0b63f6,#0284c7);color:#fff}
         .pd-btn-primary:hover{background:linear-gradient(135deg,#094fc3,#0369a1);transform:translateY(-1px);box-shadow:0 6px 18px rgba(11,99,246,.32)}
+        .pd-btn-buy-now{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;box-shadow:0 3px 12px rgba(234,88,12,.24)}
+        .pd-btn-buy-now:hover{background:linear-gradient(135deg,#c2410c,#ea580c);color:#fff;transform:translateY(-1px);box-shadow:0 6px 18px rgba(234,88,12,.35)}
         .pd-btn-soft{background:#f0f7ff;color:#0284c7;border:1px solid #bae0fd;box-shadow:none}
         .pd-btn-soft:hover{background:#e0f2fe;color:#0369a1;border-color:#7dd3fc}
+        .pd-btn-prescription{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;box-shadow:0 3px 12px rgba(234,88,12,.24)}
+        
+        /* BỘ CHỌN SỐ LƯỢNG */
+        .pd-qty-wrap{display:flex;align-items:center;gap:14px;margin-top:16px}
+        .pd-qty-label{font-size:14px;font-weight:700;color:#334155}
+        .pd-qty-selector{display:inline-flex;align-items:center;border:1.5px solid #cbd5e1;border-radius:12px;background:#f8fafc;overflow:hidden}
+        .pd-qty-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:#fff;border:0;color:#0f2f5a;font-size:13px;cursor:pointer;transition:background .2s}
+        .pd-qty-btn:hover{background:#e2e8f0}
+        .pd-qty-btn:active{background:#cbd5e1}
+        .pd-qty-input{width:46px;height:36px;border:0;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;text-align:center;font-size:15px;font-weight:700;color:#0f2f5a;background:#fff;-moz-appearance:textfield}
+        .pd-qty-input::-webkit-outer-spin-button,.pd-qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+        /* MOBILE STICKY BOTTOM BAR */
+        .pd-mobile-sticky-bar{display:none}
+        @media (max-width: 767px){
+            .pd-page-wrap{
+                padding-bottom:95px !important;
+            }
+            .pd-mobile-sticky-bar{
+                display:block;
+                position:fixed;
+                bottom:0;
+                left:0;
+                right:0;
+                z-index:998;
+                background:#ffffff;
+                box-shadow:0 -4px 20px rgba(15,23,42,.12);
+                border-top:1px solid #e2e8f0;
+                padding:8px 12px;
+                padding-bottom:max(8px, env(safe-area-inset-bottom));
+            }
+            .pd-sticky-inner{
+                display:flex;
+                align-items:center;
+                gap:8px;
+                max-width:540px;
+                margin:0 auto;
+            }
+            .pd-sticky-btn-consult{
+                display:flex;
+                flex-direction:column;
+                align-items:center;
+                justify-content:center;
+                min-width:56px;
+                height:46px;
+                border-radius:12px;
+                background:#f0fdf4;
+                color:#16a34a;
+                border:1px solid #bbf7d0;
+                text-decoration:none;
+                font-size:11px;
+                font-weight:700;
+                line-height:1.2;
+                gap:2px;
+                flex-shrink:0;
+            }
+            .pd-sticky-icon{width:18px;height:18px}
+            .pd-sticky-btn-add{
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                gap:6px;
+                flex:1;
+                height:46px;
+                border-radius:14px;
+                background:#f0f7ff;
+                color:#0b63f6;
+                border:1.5px solid #bae0fd;
+                font-size:13px;
+                font-weight:700;
+                cursor:pointer;
+                transition:all .2s ease;
+            }
+            .pd-sticky-btn-add:active{transform:scale(0.97);background:#e0f2fe}
+            .pd-sticky-btn-buy{
+                display:flex;
+                flex-direction:column;
+                align-items:center;
+                justify-content:center;
+                flex:1.3;
+                height:46px;
+                border-radius:14px;
+                background:linear-gradient(135deg,#0b63f6 0%,#0284c7 100%);
+                color:#fff;
+                border:0;
+                cursor:pointer;
+                box-shadow:0 4px 14px rgba(11,99,246,.35);
+                transition:all .2s ease;
+            }
+            .pd-sticky-btn-buy span{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:1}
+            .pd-sticky-btn-buy strong{font-size:13px;font-weight:800;line-height:1.2;margin-top:2px}
+            .pd-sticky-btn-buy:active{transform:scale(0.97);box-shadow:0 2px 8px rgba(11,99,246,.2)}
+            .pd-sticky-btn-prescription{
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                gap:8px;
+                flex:1;
+                height:46px;
+                border-radius:14px;
+                background:linear-gradient(135deg,#ea580c 0%,#f97316 100%);
+                color:#fff;
+                font-size:13px;
+                font-weight:700;
+                text-decoration:none;
+                box-shadow:0 4px 14px rgba(234,88,12,.35);
+            }
+        }
         .pd-description{margin-top:32px;padding:26px 8px 0;border-top:1px solid #e5edf7}
         .pd-description h2{margin:0 0 16px;color:#103a7a}
         .pd-description-body{color:#334155;line-height:1.8;font-size:16px}
@@ -116,10 +226,26 @@ $detailDisplayPrice = $finalPrice > 0 ? number_format($finalPrice, 0, ',', '.') 
                             <span class="pd-price-new"><?php echo $detailDisplayPrice; ?></span>
                         </div>
                         <?php if ($cartEnabled) { ?>
-                            <div class="pd-actions">
-                                <button type="button" class="pd-btn pd-btn-primary js-detail-add-cart" data-product-id="<?php echo (int)$product->pid; ?>"><i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ hàng</button>
-                                <a class="pd-btn pd-btn-soft" href="<?php echo XC_URL; ?>/gio-hang.html"><i class="fa-solid fa-cart-shopping"></i> Xem giỏ hàng</a>
-                            </div>
+                            <?php if ($finalPrice > 0) { ?>
+                                <div class="pd-qty-wrap">
+                                    <span class="pd-qty-label">Số lượng:</span>
+                                    <div class="pd-qty-selector">
+                                        <button type="button" class="pd-qty-btn js-pd-qty-minus" aria-label="Giảm"><i class="fa-solid fa-minus"></i></button>
+                                        <input type="number" id="pdQuantityInput" class="pd-qty-input" value="1" min="1" max="99" readonly>
+                                        <button type="button" class="pd-qty-btn js-pd-qty-plus" aria-label="Tăng"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="pd-actions">
+                                    <button type="button" class="pd-btn pd-btn-primary js-detail-add-cart" data-product-id="<?php echo (int)$product->pid; ?>"><i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ hàng</button>
+                                    <button type="button" class="pd-btn pd-btn-buy-now js-quick-buy" data-product-id="<?php echo (int)$product->pid; ?>"><i class="fa-solid fa-bolt"></i> Mua ngay</button>
+                                    <a class="pd-btn pd-btn-soft" href="<?php echo XC_URL; ?>/gio-hang.html"><i class="fa-solid fa-cart-shopping"></i> Xem giỏ hàng</a>
+                                </div>
+                            <?php } else { ?>
+                                <div class="pd-actions">
+                                    <a class="pd-btn pd-btn-prescription" href="https://zalo.me/0839995775" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-file-prescription"></i> Thuốc cần đơn - Nhắn tin Dược sĩ tư vấn</a>
+                                    <a class="pd-btn pd-btn-soft" href="tel:0839995775"><i class="fa-solid fa-phone"></i> Hotline: 0839 995 775</a>
+                                </div>
+                            <?php } ?>
                         <?php } ?>
                     </div>
                 </div>
@@ -160,5 +286,103 @@ $detailDisplayPrice = $finalPrice > 0 ? number_format($finalPrice, 0, ',', '.') 
         </div>
     <?php } ?>
 </div>
+
+<?php if ($cartEnabled && $product) { 
+    $isPrescription = ($finalPrice <= 0);
+?>
+<div class="pd-mobile-sticky-bar">
+    <div class="pd-sticky-inner">
+        <a href="https://zalo.me/0839995775" target="_blank" rel="noopener noreferrer" class="pd-sticky-btn-consult" title="Tư vấn Dược sĩ qua Zalo">
+            <svg class="pd-sticky-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <span>Tư vấn</span>
+        </a>
+
+        <?php if (!$isPrescription) { ?>
+            <button type="button" class="pd-sticky-btn-add js-detail-add-cart" data-product-id="<?php echo (int)$product->pid; ?>">
+                <i class="fa-solid fa-cart-plus"></i>
+                <span>Thêm giỏ</span>
+            </button>
+            <button type="button" class="pd-sticky-btn-buy js-quick-buy" data-product-id="<?php echo (int)$product->pid; ?>">
+                <span>Mua ngay</span>
+                <strong><?php echo $detailDisplayPrice; ?></strong>
+            </button>
+        <?php } else { ?>
+            <a href="https://zalo.me/0839995775" target="_blank" rel="noopener noreferrer" class="pd-sticky-btn-prescription">
+                <i class="fa-solid fa-file-prescription"></i>
+                <span>Gửi đơn thuốc cho Dược sĩ</span>
+            </a>
+        <?php } ?>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var qtyInput = document.getElementById("pdQuantityInput");
+    var minusBtn = document.querySelector(".js-pd-qty-minus");
+    var plusBtn = document.querySelector(".js-pd-qty-plus");
+
+    function updateAllAddButtonsQty(val) {
+        document.querySelectorAll(".js-detail-add-cart, .js-quick-buy").forEach(function(el) {
+            el.dataset.quantity = val;
+        });
+    }
+
+    if (minusBtn && plusBtn && qtyInput) {
+        minusBtn.addEventListener("click", function() {
+            var val = parseInt(qtyInput.value) || 1;
+            if (val > 1) {
+                qtyInput.value = val - 1;
+                updateAllAddButtonsQty(val - 1);
+            }
+        });
+        plusBtn.addEventListener("click", function() {
+            var val = parseInt(qtyInput.value) || 1;
+            if (val < 99) {
+                qtyInput.value = val + 1;
+                updateAllAddButtonsQty(val + 1);
+            }
+        });
+    }
+
+    jQuery(document).on('click', '.js-quick-buy', function() {
+        var btn = this;
+        var productId = btn.dataset.productId;
+        var qty = parseInt(btn.dataset.quantity) || (qtyInput ? parseInt(qtyInput.value) : 1) || 1;
+        var originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span>Đang chuyển...</span>';
+
+        jQuery.ajax({
+            url: '<?php echo XC_URL; ?>/api/cartAdd',
+            type: 'POST',
+            dataType: 'json',
+            headers: {
+                'X-CSRF-Token': '<?php echo !empty($_SESSION["cart_csrf"]) ? $_SESSION["cart_csrf"] : ""; ?>'
+            },
+            data: {
+                product_id: productId,
+                quantity: qty
+            }
+        }).done(function(res) {
+            if (res && res.success) {
+                window.location.assign('<?php echo XC_URL; ?>/gio-hang.html');
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                if (window.Swal) {
+                    Swal.fire({position:'center', icon:'error', title: res.message || 'Không thể thêm sản phẩm.', showConfirmButton:true, confirmButtonText:'Đóng', timer:3500, timerProgressBar:true});
+                }
+            }
+        }).fail(function() {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+            if (window.Swal) {
+                Swal.fire({position:'center', icon:'error', title: 'Lỗi kết nối máy chủ.', showConfirmButton:true, confirmButtonText:'Đóng', timer:3500, timerProgressBar:true});
+            }
+        });
+    });
+});
+</script>
+<?php } ?>
 </main>
 <?php require "footer_new.php"; ?>

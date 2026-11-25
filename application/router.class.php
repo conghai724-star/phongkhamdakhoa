@@ -134,7 +134,7 @@ private function getController() {
 	{
 		/*** get the parts of the route ***/
 		$parts = explode('/', $route);
-		if($parts[0] == "login")
+		if($parts[0] == "login" || $parts[0] == "dang-nhap.html" || $parts[0] == "dang-nhap")
 		{
 			// var_dump(222);
 			$this->controller = "member";
@@ -148,6 +148,19 @@ private function getController() {
 					$args[$k++] = $parts[$i]; 
 				$this->args = $args;
 			} 
+		}elseif($parts[0] == "dang-ky.html" || $parts[0] == "dang-ky" || $parts[0] == "register")
+		{
+			$this->controller = "member";
+			$this->action = "register";
+			if(isset( $parts[1]))
+			{
+				$count_args = count($parts);
+				$k = 1;
+				$args = array();
+				for($i = 1; $i < $count_args; $i++)
+					$args[$k++] = $parts[$i]; 
+				$this->args = $args;
+			}
 		}elseif($parts[0] == "dich-vu")
 		{
 			// echo $parts[0];
@@ -206,6 +219,20 @@ private function getController() {
 				$this->args = $args;
 			}
 		}
+		elseif($parts[0] == "dat-hang-thanh-cong.html" || $parts[0] == "cam-on.html" || $parts[0] == "cam-on" || $parts[0] == "thank-you")
+		{
+			$this->controller = "page";
+			$this->action = "thankyou";
+			if(isset($parts[1]))
+			{
+				$count_args = count($parts);
+				$k = 1;
+				$args = array();
+				for($i = 1; $i < $count_args; $i++)
+					$args[$k++] = $parts[$i]; 
+				$this->args = $args;
+			}
+		}
 		elseif($parts[0] == "gio-hang.html")
 		{
 			$this->controller = "page";
@@ -249,11 +276,25 @@ private function getController() {
 			}
 		}
 		//Router page
-		elseif($parts[0] == "gioi-thieu.html")
+		elseif($parts[0] == "gioi-thieu.html" || $parts[0] == "gioithieu.html")
 		{
 			// echo $parts[0];
 			$this->controller = "page";
 			$this->action = "introduce";
+			if(isset( $parts[1]))
+			{
+				$count_args = count($parts);
+				$k = 1;
+				$args = array();
+				for($i = 1; $i < $count_args; $i++)
+					$args[$k++] = $parts[$i]; 
+				$this->args = $args;
+			}
+		}
+		elseif($parts[0] == "chinhsach.html" || $parts[0] == "chinh-sach.html")
+		{
+			$this->controller = "page";
+			$this->action = "chinhsach";
 			if(isset( $parts[1]))
 			{
 				$count_args = count($parts);
@@ -432,11 +473,24 @@ private function getController() {
 					$args[$k++] = $parts[$i]; 
 				$this->args = $args;
 			}
-		}elseif($parts[0] == "gioi-thieu")
+		}elseif($parts[0] == "gioi-thieu" || $parts[0] == "gioithieu")
 		{
 			// echo $parts[0];
 			$this->controller = "page";
 			$this->action = "introduce";
+			if(isset( $parts[1]))
+			{
+				$count_args = count($parts);
+				$k = 1;
+				$args = array();
+				for($i = 1; $i < $count_args; $i++)
+					$args[$k++] = $parts[$i]; 
+				$this->args = $args;
+			}
+		}elseif($parts[0] == "chinhsach" || $parts[0] == "chinh-sach")
+		{
+			$this->controller = "page";
+			$this->action = "chinhsach";
 			if(isset( $parts[1]))
 			{
 				$count_args = count($parts);

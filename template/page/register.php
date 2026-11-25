@@ -25,7 +25,7 @@ if (empty($_SESSION['register_csrf'])) {
             Đăng ký tài khoản
          </h1>
          <p style="margin: 0; font-size: 13.5px; opacity: 0.92; color: #ffffff;">
-            Tạo tài khoản để theo dõi lịch khám, đơn thuốc và hồ sơ cá nhân
+            Đăng ký thành viên nhà thuốc để tích lũy điểm thưởng và nhận voucher ưu đãi
          </p>
       </div>
 
@@ -66,7 +66,7 @@ if (empty($_SESSION['register_csrf'])) {
          </div>
 
          <!-- Form đăng ký -->
-         <form id="register-form" style="display: flex; flex-direction: column; gap: 14px;">
+         <form id="register-form" method="post" action="javascript:void(0);" novalidate style="display: flex; flex-direction: column; gap: 14px;">
             <input type="hidden" name="csrf" value="<?php echo htmlspecialchars($_SESSION['register_csrf'], ENT_QUOTES, 'UTF-8'); ?>">
 
             <div>
@@ -100,18 +100,54 @@ if (empty($_SESSION['register_csrf'])) {
                <label for="reg-password" style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px; color: #1e293b;">
                   Mật khẩu <span style="color: #ef4444;">*</span>
                </label>
-               <input type="password" name="password" id="reg-password" required minlength="6" maxlength="1000" autocomplete="new-password" 
-                  placeholder="Tối thiểu 6 ký tự"
-                  style="width: 100%; box-sizing: border-box; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14.5px; color: #0f172a; outline: none;">
+               <div style="position: relative;">
+                  <input type="password" name="password" id="reg-password" required maxlength="1000" autocomplete="new-password" 
+                     placeholder="Tối thiểu 8 ký tự (hoa, thường, số, ký tự đặc biệt)"
+                     style="width: 100%; box-sizing: border-box; padding: 11px 44px 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14.5px; color: #0f172a; outline: none;">
+                  <button type="button" class="btn-toggle-pwd" data-target="#reg-password" title="Hiện/Ẩn mật khẩu" aria-label="Hiện hoặc ẩn mật khẩu"
+                     style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #64748b; cursor: pointer; padding: 6px; font-size: 15px;">
+                     <i class="fa-solid fa-eye"></i>
+                  </button>
+               </div>
             </div>
 
             <div>
                <label for="reg-repassword" style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px; color: #1e293b;">
                   Xác nhận mật khẩu <span style="color: #ef4444;">*</span>
                </label>
-               <input type="password" name="repassword" id="reg-repassword" required minlength="6" maxlength="1000" autocomplete="new-password" 
-                  placeholder="Nhập lại mật khẩu"
-                  style="width: 100%; box-sizing: border-box; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14.5px; color: #0f172a; outline: none;">
+               <div style="position: relative;">
+                  <input type="password" name="repassword" id="reg-repassword" required minlength="8" maxlength="1000" autocomplete="new-password" 
+                     placeholder="Nhập lại mật khẩu"
+                     style="width: 100%; box-sizing: border-box; padding: 11px 44px 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14.5px; color: #0f172a; outline: none;">
+                  <button type="button" class="btn-toggle-pwd" data-target="#reg-repassword" title="Hiện/Ẩn mật khẩu" aria-label="Hiện hoặc ẩn mật khẩu"
+                     style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #64748b; cursor: pointer; padding: 6px; font-size: 15px;">
+                     <i class="fa-solid fa-eye"></i>
+                  </button>
+               </div>
+            </div>
+
+            <div>
+               <label for="reg-captcha" style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px; color: #1e293b;">
+                  Mã xác nhận (Captcha) <span style="color: #ef4444;">*</span>
+               </label>
+               <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="text" name="captcha" id="reg-captcha" required maxlength="6" autocomplete="off" 
+                     placeholder="Nhập 5 ký tự bên phải"
+                     style="flex: 1; min-width: 0; box-sizing: border-box; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 15px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0f172a; outline: none;">
+                  
+                  <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                     <img id="reg-captcha-img" src="<?php echo XC_URL; ?>/captcha.php" alt="Mã Captcha" 
+                        title="Bấm để đổi mã khác"
+                        style="height: 42px; width: 130px; border-radius: 8px; cursor: pointer; display: block; border: 1px solid #cbd5e1; background: #f8fafc;">
+                     <button type="button" id="btn-refresh-captcha" title="Đổi mã bảo vệ khác" aria-label="Đổi mã bảo vệ khác"
+                        style="width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 8px; color: #475569; cursor: pointer; transition: all 0.2s ease;">
+                        <i class="fa-solid fa-arrows-rotate" style="font-size: 15px;"></i>
+                     </button>
+                  </div>
+               </div>
+               <span style="display: block; font-size: 12px; color: #64748b; margin-top: 4px;">
+                  Bấm vào hình ảnh hoặc nút xoay để đổi mã bảo vệ khác nếu khó nhìn.
+               </span>
             </div>
 
             <div style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin-top: 2px;">
@@ -136,65 +172,177 @@ if (empty($_SESSION['register_csrf'])) {
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-$(function () {
+(function () {
+    function initRegister() {
+        if (typeof jQuery === 'undefined') {
+            setTimeout(initRegister, 50);
+            return;
+        }
+        var $ = jQuery;
+        $(function () {
     var isSubmitting = false;
 
-    function notify(msg, isSuccess) {
+    // Toast & Dialog helper (Centered modal with auto focus)
+    function notify(msg, isSuccess, focusSelector, isHtml) {
         if (typeof Swal !== 'undefined' && Swal.fire) {
-            Swal.fire({
-                toast: true,
-                position: 'bottom-end',
+            var swalOpts = {
+                position: 'center',
                 icon: isSuccess ? 'success' : 'error',
-                title: msg,
-                showConfirmButton: false,
-                timer: 4500,
-                timerProgressBar: true
+                title: isSuccess ? 'Thành công' : 'Thông báo',
+                showConfirmButton: !isSuccess,
+                confirmButtonText: 'Đã hiểu',
+                confirmButtonColor: '#13467d',
+                timer: isSuccess ? 2000 : undefined,
+                timerProgressBar: isSuccess
+            };
+            if (isHtml || (typeof msg === 'string' && (msg.indexOf('<') !== -1 || msg.indexOf('\n') !== -1))) {
+                swalOpts.html = typeof msg === 'string' ? msg.replace(/\n/g, '<br>') : msg;
+            } else {
+                swalOpts.text = msg;
+            }
+            Swal.fire(swalOpts).then(function () {
+                if (!isSuccess && focusSelector) {
+                    $(focusSelector).focus();
+                }
             });
         } else {
             alert(msg);
+            if (!isSuccess && focusSelector) {
+                $(focusSelector).focus();
+            }
         }
     }
+
+    // Nút ẩn/hiện mật khẩu
+    $(document).on('click', '.btn-toggle-pwd', function (e) {
+        e.preventDefault();
+        var target = $(this).data('target');
+        var $input = $(target);
+        var $icon = $(this).find('i');
+        if ($input.attr('type') === 'password') {
+            $input.attr('type', 'text');
+            $icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            $input.attr('type', 'password');
+            $icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
 
     $('#register-form').on('submit', function (e) {
         e.preventDefault();
         if (isSubmitting) return;
 
-        var fullname   = $.trim($('#reg-fullname').val());
-        var phone      = $.trim($('#reg-phone').val()).replace(/[\s.\-]/g, '').replace(/^(?:\+84|84)/, '0');
-        var email      = $.trim($('#reg-email').val());
-        var password   = $('#reg-password').val();
-        var repassword = $('#reg-repassword').val();
-        var csrf       = $('input[name="csrf"]').val();
+        var rawFullname = $('#reg-fullname').val() || '';
+        var fullname    = $.trim(rawFullname);
+        var rawPhone    = $('#reg-phone').val() || '';
+        var cleanPhone  = $.trim(rawPhone).replace(/[\s.\-]/g, '').replace(/^(?:\+84|84)/, '0');
+        var email       = $.trim($('#reg-email').val());
+        var password    = $('#reg-password').val() || '';
+        var repassword  = $('#reg-repassword').val() || '';
+        var captcha     = $.trim($('#reg-captcha').val());
+        var csrf        = $('input[name="csrf"]').val();
 
+        // 1. Kiểm tra Họ và tên
+        if (fullname === '') {
+            notify('Vui lòng nhập Họ và tên của bạn.', false, '#reg-fullname');
+            return;
+        }
         if (fullname.length < 2) {
-            notify('Vui lòng nhập họ và tên (tối thiểu 2 ký tự).', false);
-            $('#reg-fullname').focus();
+            notify('Họ và tên quá ngắn. Vui lòng nhập tối thiểu 2 ký tự.', false, '#reg-fullname');
+            return;
+        }
+        if (/[<>{}()\[\]\\\/^$*~`]/.test(rawFullname)) {
+            notify('Họ và tên không hợp lệ. Vui lòng không nhập ký tự đặc biệt.', false, '#reg-fullname');
             return;
         }
 
-        var phoneRegex = /^0[35789][0-9]{8}$/;
-        if (!phoneRegex.test(phone)) {
-            notify('Vui lòng nhập số điện thoại di động Việt Nam hợp lệ (10 số, bắt đầu bằng 03, 05, 07, 08, 09).', false);
-            $('#reg-phone').focus();
+        // 2. Kiểm tra Số điện thoại (từng lỗi chi tiết)
+        if (cleanPhone === '') {
+            notify('Vui lòng nhập số điện thoại liên hệ.', false, '#reg-phone');
+            return;
+        }
+        if (!/^[0-9]+$/.test(cleanPhone)) {
+            notify('Số điện thoại chỉ được chứa các chữ số (0 - 9).', false, '#reg-phone');
+            return;
+        }
+        if (!/^(03|05|07|08|09)/.test(cleanPhone)) {
+            notify('Số điện thoại không hợp lệ. Vui lòng dùng các đầu số di động Việt Nam: 03, 05, 07, 08 hoặc 09.', false, '#reg-phone');
+            return;
+        }
+        if (cleanPhone.length < 10) {
+            notify('Số điện thoại chưa đủ 10 chữ số (Quý khách mới nhập ' + cleanPhone.length + ' số).', false, '#reg-phone');
+            return;
+        }
+        if (cleanPhone.length > 10) {
+            notify('Số điện thoại không được vượt quá 10 chữ số (Hiện đang có ' + cleanPhone.length + ' số).', false, '#reg-phone');
             return;
         }
 
-        if (password.length < 6) {
-            notify('Mật khẩu phải có tối thiểu 6 ký tự.', false);
-            $('#reg-password').focus();
+        // 3. Kiểm tra Email (nếu có nhập)
+        if (email !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            notify('Địa chỉ email không đúng định dạng (Ví dụ: yourname@gmail.com).', false, '#reg-email');
             return;
         }
 
-        if (password !== repassword) {
-            notify('Mật khẩu xác nhận không khớp. Vui lòng kiểm tra lại.', false);
-            $('#reg-repassword').focus();
+        // 4. Kiểm tra Mật khẩu theo các tiêu chí (Cách 2: Gộp tất cả các yếu tố đang thiếu)
+        if (password === '') {
+            notify('Vui lòng nhập mật khẩu đăng ký.', false, '#reg-password');
             return;
         }
 
+        var pwdMissing = [];
+        if (password.length < 8) {
+            pwdMissing.push('Tối thiểu 8 ký tự (hiện có ' + password.length + ' ký tự)');
+        }
+        if (!/[A-Z]/.test(password)) {
+            pwdMissing.push('Chữ in hoa (A-Z)');
+        }
+        if (!/[a-z]/.test(password)) {
+            pwdMissing.push('Chữ thường (a-z)');
+        }
+        if (!/[0-9]/.test(password)) {
+            pwdMissing.push('Chữ số (0-9)');
+        }
+        if (!/[^a-zA-Z0-9]/.test(password)) {
+            pwdMissing.push('Ký tự đặc biệt (@, #, $, %, !, *, ...)');
+        }
+
+        if (pwdMissing.length > 0) {
+            var htmlMsg = '<div style="text-align: left; font-size: 14px; line-height: 1.6;">' +
+                '<p style="margin: 0 0 8px 0; font-weight: 600; color: #1e293b;">Mật khẩu chưa đạt yêu cầu an toàn. Hiện đang còn thiếu:</p>' +
+                '<ul style="margin: 0; padding-left: 20px; color: #dc2626;">' +
+                pwdMissing.map(function(item) { return '<li style="margin-bottom: 4px;">' + item + '</li>'; }).join('') +
+                '</ul>' +
+                '</div>';
+            notify(htmlMsg, false, '#reg-password', true);
+            return;
+        }
+
+        // 5. Kiểm tra Xác nhận mật khẩu
+        if (repassword === '') {
+            notify('Vui lòng nhập lại mật khẩu vào ô Xác nhận mật khẩu.', false, '#reg-repassword');
+            return;
+        }
+        if (repassword !== password) {
+            notify('Mật khẩu xác nhận không trùng khớp. Vui lòng kiểm tra lại.', false, '#reg-repassword');
+            return;
+        }
+
+        // 6. Kiểm tra Captcha
+        if (captcha === '') {
+            notify('Vui lòng nhập mã bảo mật Captcha (5 ký tự).', false, '#reg-captcha');
+            return;
+        }
+        if (captcha.length < 5) {
+            notify('Mã Captcha gồm đúng 5 ký tự. Vui lòng nhập đủ 5 ký tự.', false, '#reg-captcha');
+            return;
+        }
+
+        // Bắt đầu gửi AJAX
         isSubmitting = true;
         var $btn = $('#btn-register-submit');
-        var originalBtnText = $btn.html();
-        $btn.prop('disabled', true).text('Đang xử lý đăng ký...');
+        var originalBtnHtml = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý đăng ký...');
 
         $.ajax({
             type: 'POST',
@@ -202,30 +350,75 @@ $(function () {
             data: {
                 csrf: csrf,
                 fullname: fullname,
-                phone: phone,
+                phone: cleanPhone,
                 email: email,
                 password: password,
-                repassword: repassword
+                repassword: repassword,
+                captcha: captcha
             },
             dataType: 'json',
             success: function (res) {
                 if (res && res.success) {
-                    notify(res.message || 'Đăng ký tài khoản thành công!', true);
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Đăng ký thành công!',
+                        text: 'Chào mừng ' + fullname + ' gia nhập hệ thống khách hàng thân thiết. Đang chuyển hướng...',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
                     setTimeout(function () {
                         window.location.assign(res.return_url || <?php echo json_encode(XC_URL); ?>);
-                    }, 1200);
-                } else {
-                    notify((res && res.message) ? res.message : 'Đăng ký không thành công. Vui lòng kiểm tra lại thông tin.', false);
+                    }, 1800);
+                } else if (res && res.status === 409) {
                     isSubmitting = false;
-                    $btn.prop('disabled', false).html(originalBtnText);
+                    $btn.prop('disabled', false).html(originalBtnHtml);
+                    reloadCaptcha();
+
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'warning',
+                        title: 'Tài khoản đã tồn tại',
+                        text: res.message || 'Số điện thoại này đã được đăng ký tài khoản trên hệ thống.',
+                        showCancelButton: true,
+                        confirmButtonText: '<i class="fa-solid fa-right-to-bracket"></i> Đăng nhập ngay',
+                        cancelButtonText: 'Đổi số khác',
+                        confirmButtonColor: '#13467d',
+                        cancelButtonColor: '#64748b'
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            window.location.assign(<?php echo json_encode(XC_URL . '/login'); ?>);
+                        } else {
+                            $('#reg-phone').focus().select();
+                        }
+                    });
+                } else {
+                    var errorMsg = (res && res.message) ? res.message : 'Đăng ký không thành công. Vui lòng kiểm tra lại thông tin.';
+                    var isCaptchaErr = errorMsg.toLowerCase().indexOf('bảo vệ') !== -1 || errorMsg.toLowerCase().indexOf('captcha') !== -1;
+                    notify(errorMsg, false, isCaptchaErr ? '#reg-captcha' : null);
+                    isSubmitting = false;
+                    $btn.prop('disabled', false).html(originalBtnHtml);
+                    reloadCaptcha();
                 }
             },
             error: function () {
-                notify('Không thể kết nối đến máy chủ. Vui lòng thử lại sau.', false);
+                notify('Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.', false);
                 isSubmitting = false;
-                $btn.prop('disabled', false).html(originalBtnText);
+                $btn.prop('disabled', false).html(originalBtnHtml);
             }
         });
+    });
+
+    function reloadCaptcha() {
+        var url = <?php echo json_encode(XC_URL . '/captcha.php'); ?> + '?t=' + new Date().getTime();
+        $('#reg-captcha-img').attr('src', url);
+        $('#reg-captcha').val('');
+    }
+
+    $('#reg-captcha-img, #btn-refresh-captcha').on('click', function (e) {
+        e.preventDefault();
+        reloadCaptcha();
     });
 
     // Social login click handler
@@ -250,7 +443,10 @@ $(function () {
             }
         });
     });
-});
+        });
+    }
+    initRegister();
+})();
 </script>
 
 <?php include "footer_new.php"; ?>

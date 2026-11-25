@@ -95,8 +95,227 @@
     stroke-linejoin: round;
 }
 
+/* ========================================================
+   CHUẨN HÓA GIAO DIỆN SWEETALERT2 CAO CẤP & KHẮC PHỤC LỖI VIEW
+   - Ngăn chặn lỗi CSS Reset của theme làm tràn vòng tròn xoay ra ngoài góc
+   - Bo góc mềm mại 20px, đổ bóng thẻ nổi bật sang trọng
+   - Icon căn giữa chính xác, typography sắc nét
+   ======================================================== */
 .swal2-container {
     z-index: 100200 !important;
+    background: rgba(15, 23, 42, 0.48) !important;
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+}
+
+/* Khung thông báo trung tâm */
+.swal2-container .swal2-popup {
+    background: #ffffff !important;
+    border-radius: 20px !important;
+    padding: 30px 24px 24px !important;
+    width: calc(100% - 32px) !important;
+    max-width: 400px !important;
+    margin: 0 auto !important;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(15, 23, 42, 0.06) !important;
+    border: none !important;
+    overflow: hidden !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+}
+
+.swal2-container .swal2-popup.swal2-show {
+    animation: pkSwalPopIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+@keyframes pkSwalPopIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(8px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Biểu tượng thông báo */
+.swal2-container .swal2-icon {
+    width: 62px !important;
+    height: 62px !important;
+    margin: 0 auto 16px !important;
+    border-width: 3px !important;
+    border-style: solid !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    zoom: 1 !important;
+}
+
+/* Khắc phục triệt để lỗi theme reset làm lộ các khối mặt nạ quay gốc của SweetAlert */
+.swal2-container .swal2-icon.swal2-success .swal2-success-circular-line-left,
+.swal2-container .swal2-icon.swal2-success .swal2-success-circular-line-right,
+.swal2-container .swal2-icon.swal2-success .swal2-success-fix,
+.swal2-container .swal2-icon.swal2-success .swal2-success-ring {
+    display: none !important;
+}
+
+/* Biểu tượng Thành công (Success) */
+.swal2-container .swal2-icon.swal2-success {
+    border-color: #10b981 !important;
+    color: #10b981 !important;
+}
+.swal2-container .swal2-icon.swal2-success [class^='swal2-success-line'] {
+    background-color: #10b981 !important;
+    height: 3.5px !important;
+    border-radius: 2px !important;
+    display: block !important;
+    position: absolute !important;
+    z-index: 2 !important;
+}
+.swal2-container .swal2-icon.swal2-success .swal2-success-line-tip {
+    top: 32px !important;
+    left: 12px !important;
+    width: 18px !important;
+    transform: rotate(45deg) !important;
+}
+.swal2-container .swal2-icon.swal2-success .swal2-success-line-long {
+    top: 28px !important;
+    right: 8px !important;
+    width: 31px !important;
+    transform: rotate(-45deg) !important;
+}
+
+/* Biểu tượng Thất bại / Lỗi (Error) - Căn giữa chuẩn hình học tuyệt đối */
+.swal2-container .swal2-icon.swal2-error {
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+    position: relative !important;
+}
+.swal2-container .swal2-icon.swal2-error .swal2-x-mark {
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.swal2-container .swal2-icon.swal2-error .swal2-x-mark-line-left {
+    display: block !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 28px !important;
+    height: 3.5px !important;
+    margin: 0 !important;
+    border-radius: 2px !important;
+    background-color: #ef4444 !important;
+    transform: translate(-50%, -50%) rotate(45deg) !important;
+}
+.swal2-container .swal2-icon.swal2-error .swal2-x-mark-line-right {
+    display: block !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 28px !important;
+    height: 3.5px !important;
+    margin: 0 !important;
+    border-radius: 2px !important;
+    background-color: #ef4444 !important;
+    transform: translate(-50%, -50%) rotate(-45deg) !important;
+}
+
+/* Biểu tượng Cảnh báo (Warning) */
+.swal2-container .swal2-icon.swal2-warning {
+    border-color: #f59e0b !important;
+    color: #f59e0b !important;
+    font-size: 34px !important;
+    line-height: 54px !important;
+}
+
+/* Biểu tượng Thông tin (Info) */
+.swal2-container .swal2-icon.swal2-info {
+    border-color: #0ea5e9 !important;
+    color: #0ea5e9 !important;
+    font-size: 34px !important;
+    line-height: 54px !important;
+}
+
+/* Tiêu đề thông báo */
+.swal2-container .swal2-title {
+    font-family: inherit !important;
+    font-size: 16.5px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    line-height: 1.45 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+}
+
+/* Nội dung phụ / Chi tiết lỗi */
+.swal2-container .swal2-html-container {
+    font-family: inherit !important;
+    font-size: 14px !important;
+    color: #64748b !important;
+    line-height: 1.55 !important;
+    margin: 8px 0 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+}
+
+/* Hàng nút bấm */
+.swal2-container .swal2-actions {
+    margin: 20px 0 0 !important;
+    gap: 10px !important;
+    width: 100% !important;
+    justify-content: center !important;
+}
+
+.swal2-container .swal2-actions button.swal2-confirm {
+    background: #1760a5 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    padding: 10px 26px !important;
+    box-shadow: 0 4px 14px rgba(23, 96, 165, 0.25) !important;
+    outline: none !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+.swal2-container .swal2-actions button.swal2-confirm:hover {
+    background: #124d85 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 18px rgba(23, 96, 165, 0.35) !important;
+}
+
+.swal2-container .swal2-actions button.swal2-cancel {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    padding: 10px 22px !important;
+    outline: none !important;
+    cursor: pointer !important;
+}
+.swal2-container .swal2-actions button.swal2-cancel:hover {
+    background: #e2e8f0 !important;
+}
+
+/* Thanh thời gian (Timer Progress Bar) */
+.swal2-container .swal2-timer-progress-bar {
+    background: #10b981 !important;
+    height: 3px !important;
+    border-radius: 0 0 20px 20px !important;
+}
+.swal2-container .swal2-popup.swal2-icon-error .swal2-timer-progress-bar {
+    background: #ef4444 !important;
 }
 
 /* Nút Đăng nhập & Giỏ hàng Desktop: Chuẩn 38px, box-sizing border-box, KHÔNG nhảy kích thước */
@@ -1041,7 +1260,7 @@ body.customer-login-open {
                             }
                             var msg = resp.message || 'Không thể khởi tạo đăng nhập. Vui lòng thử lại sau.';
                             if (typeof Swal !== 'undefined' && Swal.fire) {
-                                Swal.fire({toast: true, position: 'bottom-end', icon: 'error', title: msg, showConfirmButton: false, timer: 5000});
+                                Swal.fire({position: 'center', icon: 'error', title: msg, showConfirmButton: true, confirmButtonText: 'Đóng'});
                             } else {
                                 alert(msg);
                             }
@@ -1096,7 +1315,7 @@ body.customer-login-open {
 document.addEventListener('DOMContentLoaded', function() {
     var err = <?php echo json_encode($_SESSION['social_login_error'], JSON_UNESCAPED_UNICODE); ?>;
     if (typeof Swal !== 'undefined' && Swal.fire) {
-        Swal.fire({toast: true, position: 'bottom-end', icon: 'error', title: err, showConfirmButton: false, timer: 5000});
+        Swal.fire({position: 'center', icon: 'error', title: err, showConfirmButton: true, confirmButtonText: 'Đóng'});
     }
 });
 </script>
@@ -1107,7 +1326,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
     var msg = <?php echo json_encode($_SESSION['social_login_success'], JSON_UNESCAPED_UNICODE); ?>;
     if (typeof Swal !== 'undefined' && Swal.fire) {
-        Swal.fire({toast: true, position: 'bottom-end', icon: 'success', title: msg, showConfirmButton: false, timer: 4000});
+        Swal.fire({position: 'center', icon: 'success', title: msg, showConfirmButton: false, timer: 2500, timerProgressBar: true});
     }
 });
 </script>

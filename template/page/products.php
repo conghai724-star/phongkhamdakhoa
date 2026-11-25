@@ -94,10 +94,20 @@ window.addEventListener("click", function(event) {
         .pm-btn-add-cart:disabled{opacity:.75;cursor:not-allowed;transform:none}
         .pm-link-cart{font-size:12px;font-weight:600;color:#0284c7;background:#f0f7ff;padding:6px 10px;border-radius:16px;border:1px solid #bae0fd;text-decoration:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;transition:all .2s ease}
         .pm-link-cart:hover{background:#e0f2fe;color:#0369a1;border-color:#7dd3fc}
+        /* THANH DANH MỤC TRƯỢT NGANG (HORIZONTAL CHIPS) CHO MOBILE */
+        .pm-mobile-chips-bar{display:none}
+        @media (max-width: 991px) {
+            .pm-mobile-chips-bar{display:flex;align-items:center;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:4px 2px 10px 2px;margin-bottom:10px;scrollbar-width:none}
+            .pm-mobile-chips-bar::-webkit-scrollbar{display:none}
+            .pm-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:#f1f5f9;color:#334155;font-size:12.5px;font-weight:600;text-decoration:none;white-space:nowrap;border:1px solid #e2e8f0;transition:all .2s ease;flex-shrink:0}
+            .pm-chip i{font-size:12px;color:#64748b}
+            .pm-chip.active{background:linear-gradient(135deg,#0b63f6 0%,#0284c7 100%);color:#fff;border-color:#0b63f6;box-shadow:0 4px 12px rgba(11,99,246,.28)}
+            .pm-chip.active i{color:#fff}
+        }
         @media (max-width: 575px) {
-            .pm-card-actions{flex-direction:column;gap:6px;margin-top:8px}
-            .pm-btn-add-cart{width:100%;min-width:0;padding:6px 8px;font-size:11.5px;border-radius:14px;justify-content:center}
-            .pm-link-cart{width:100%;justify-content:center;padding:4px 6px;font-size:11px;border-radius:12px;box-sizing:border-box}
+            .pm-card-actions{display:flex;margin-top:8px}
+            .pm-btn-add-cart{width:100%;min-width:0;padding:8px 10px;font-size:12px;font-weight:700;border-radius:14px;justify-content:center}
+            .pm-link-cart{display:none !important}
         }
         <?php } ?>
     </style>
@@ -105,8 +115,24 @@ window.addEventListener("click", function(event) {
     <div class="ctn">
         <div class="pm-container">
             <div class="pm-mobile-category">
+                <!-- Thanh trượt ngang danh mục thuốc dạng Pill/Chips -->
+                <div class="pm-mobile-chips-bar">
+                    <a href="<?php echo XC_URL; ?>/nha-thuoc.html" class="pm-chip <?php echo !$isCategoryPage ? 'active' : ''; ?>">
+                        <i class="fa-solid fa-border-all"></i>
+                        <span>Tất cả</span>
+                    </a>
+                    <?php foreach ($product_category as $item) { 
+                        $isActive = ($item->id == $currentCategoryId);
+                    ?>
+                        <a href="<?php echo $this->helper->permalink($item->id, 'category_product'); ?>" class="pm-chip <?php echo $isActive ? 'active' : ''; ?>">
+                            <i class="<?php echo !empty($item->category_icon) ? $item->category_icon : 'fa-solid fa-pills'; ?>"></i>
+                            <span><?php echo htmlspecialchars($item->category_name, ENT_QUOTES, 'UTF-8'); ?></span>
+                        </a>
+                    <?php } ?>
+                </div>
+
                 <div class="pm-mobile-select" onclick="toggleMobileMenu()">
-                    <span><i class="fa-solid fa-list-ul"></i> Chọn loại thuốc</span>
+                    <span><i class="fa-solid fa-list-ul"></i> Chọn loại thuốc khác</span>
                     <i class="fa-solid fa-chevron-down"></i>
                 </div>
                 <div class="pm-mobile-dropdown-content" id="mobileCatMenu">

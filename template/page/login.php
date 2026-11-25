@@ -62,7 +62,7 @@
          </div>
 
          <!-- Form đăng nhập thông thường -->
-         <form action="#" id="login-form" style="display: flex; flex-direction: column; gap: 14px;">
+         <form action="javascript:void(0);" id="login-form" method="post" style="display: flex; flex-direction: column; gap: 14px;">
             <div>
                <label for="phone" style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px; color: #1e293b;">
                   Tài khoản / Email / Số điện thoại
@@ -81,9 +81,15 @@
                      Quên mật khẩu?
                   </a>
                </div>
-               <input type="password" name="password" id="password" required maxlength="1024" autocomplete="current-password" 
-                  placeholder="Nhập mật khẩu"
-                  style="width: 100%; box-sizing: border-box; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14.5px; color: #0f172a; outline: none;">
+               <div style="position: relative;">
+                  <input type="password" name="password" id="password" required maxlength="1024" autocomplete="current-password" 
+                     placeholder="Nhập mật khẩu"
+                     style="width: 100%; box-sizing: border-box; padding: 11px 44px 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14.5px; color: #0f172a; outline: none;">
+                  <button type="button" class="btn-toggle-pwd" data-target="#password" title="Hiện/Ẩn mật khẩu" aria-label="Hiện hoặc ẩn mật khẩu"
+                     style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #64748b; cursor: pointer; padding: 6px; font-size: 15px;">
+                     <i class="fa-solid fa-eye"></i>
+                  </button>
+               </div>
             </div>
 
             <button class="btn w-100" id="btn-login-post" type="submit" 

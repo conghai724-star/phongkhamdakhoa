@@ -21,6 +21,7 @@ $headerAccountDropdown = $customerLoggedIn ? '<div class="header-account-dropdow
    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
    <head>
       <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
       <link href="<?php echo $template_path; ?>/assets/images/logo.png" type="image/x-icon" rel="shortcut icon">
       <link href="<?php echo $template_path; ?>/assets/images/logo.png" rel="apple-touch-icon-precomposed">
       <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -60,6 +61,7 @@ $headerAccountDropdown = $customerLoggedIn ? '<div class="header-account-dropdow
       <link rel='stylesheet' href="<?php echo $template_path; ?>/assets/wpcomp-quiz/assets/css/style.css" media='all' />
       <link rel='stylesheet' href="<?php echo $template_path; ?>/assets/wpmini-script-injector/assets/css/style.css" media='all' />
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.3/dist/sweetalert2.min.css"/>
       <style>
          #headerTop > .ctn{display:flex;align-items:center;justify-content:space-between;gap:12px}
          .site-cart-floating{position:fixed;right:16px;bottom:18px;z-index:999;display:none;align-items:center;gap:10px;padding:14px 16px;border-radius:999px;background:linear-gradient(135deg,#155191,#1e426f);color:#fff!important;font-weight:800;box-shadow:0 18px 35px rgba(21,81,145,.3)}
@@ -85,8 +87,22 @@ $headerAccountDropdown = $customerLoggedIn ? '<div class="header-account-dropdow
          /* =========================================================
             BANNER TOP CHUẨN MÀU THEO BANNER GỐC (MOBILE <= 991px)
             ========================================================= */
+         html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+         }
          .lc-banner-top-mobile {
             display: none;
+         }
+         @media (max-width: 991px) {
+            .is_pc { display: none !important; }
+            .is_mobi { display: block !important; }
+            .lc-banner-top-mobile { display: flex !important; }
+         }
+         @media (min-width: 992px) {
+            .is_mobi { display: none !important; }
+            .is_pc { display: block !important; }
+            .lc-banner-top-mobile { display: none !important; }
          }
 
          @media (max-width: 991px){
@@ -638,7 +654,9 @@ $headerAccountDropdown = $customerLoggedIn ? '<div class="header-account-dropdow
                            <ul class="sub-menu">
                               <li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5121"><a href="<?php echo XC_URL; ?>/gioi-thieu/5-gioi-thieu-nha-thuoc.html">Giới thiệu nhà thuốc</a></li>
                               <li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5122"><a href="<?php echo XC_URL; ?>/nha-thuoc.html">Danh mục sản phẩm</a></li>
-                              <li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5122"><a href="<?php echo XC_URL; ?>/gioi-thieu/6-chinh-sach-ban-hang.html">Chính sách bán hàng</a></li>
+                              <li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5122"><a href="<?php echo XC_URL; ?>/chinhsach/6-chinh-sach-ban-hang.html">Chính sách bán hàng</a></li>
+                              <li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5123"><a href="<?php echo XC_URL; ?>/chinhsach/8-chinh-sach-doi-tra-hoan-tien-thuoc.html">Chính sách đổi trả &amp; hoàn tiền</a></li>
+                              <li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5125"><a href="<?php echo XC_URL; ?>/chinhsach/9-chinh-sach-thanh-toan.html">Chính sách thanh toán</a></li>
                            </ul>
                         </li>
                         
@@ -744,7 +762,9 @@ $headerAccountDropdown = $customerLoggedIn ? '<div class="header-account-dropdow
                      <ul class="m-sub-list">
                         <li><a href="<?php echo XC_URL; ?>/gioi-thieu/5-gioi-thieu-nha-thuoc.html" class="m-sub-link">Giới thiệu nhà thuốc</a></li>
                         <li><a href="<?php echo XC_URL; ?>/nha-thuoc.html" class="m-sub-link">Danh mục sản phẩm</a></li>
-                        <li><a href="<?php echo XC_URL; ?>/gioi-thieu/6-chinh-sach-ban-hang.html" class="m-sub-link">Chính sách bán hàng</a></li>
+                        <li><a href="<?php echo XC_URL; ?>/chinhsach/6-chinh-sach-ban-hang.html" class="m-sub-link">Chính sách bán hàng</a></li>
+                        <li><a href="<?php echo XC_URL; ?>/chinhsach/8-chinh-sach-doi-tra-hoan-tien-thuoc.html" class="m-sub-link">Chính sách đổi trả &amp; hoàn tiền</a></li>
+                        <li><a href="<?php echo XC_URL; ?>/chinhsach/9-chinh-sach-thanh-toan.html" class="m-sub-link">Chính sách thanh toán</a></li>
                      </ul>
                   </li>
 
@@ -895,8 +915,8 @@ $headerAccountDropdown = $customerLoggedIn ? '<div class="header-account-dropdow
               if (button.disabled) return;
               button.disabled = true;
               jQuery.ajax({url:<?php echo json_encode(XC_URL.'/api/customerlogout'); ?>, type:'POST', dataType:'json', data:{csrf:<?php echo json_encode(isset($_SESSION['customer_csrf']) ? $_SESSION['customer_csrf'] : ''); ?>},
-                  success:function (data) { Swal.fire({toast:true,position:'bottom-end',icon:data.success ? 'success' : 'error',title:data.message || 'Vui lòng thử lại.',showConfirmButton:false,timer:3500}); if (data.success) setTimeout(function () { window.location.reload(); }, 600); },
-                  error:function () { Swal.fire({toast:true,position:'bottom-end',icon:'error',title:'Không thể đăng xuất. Vui lòng kiểm tra kết nối và thử lại.',showConfirmButton:false,timer:4000}); },
+                  success:function (data) { Swal.fire({position:'center',icon:data.success ? 'success' : 'error',title:data.message || 'Vui lòng thử lại.',showConfirmButton:!data.success,confirmButtonText:'Đóng',timer:data.success ? 2000 : undefined,timerProgressBar:data.success}); if (data.success) setTimeout(function () { window.location.reload(); }, 600); },
+                  error:function () { Swal.fire({position:'center',icon:'error',title:'Không thể đăng xuất. Vui lòng kiểm tra kết nối và thử lại.',showConfirmButton:true,confirmButtonText:'Đóng'}); },
                   complete:function () { button.disabled = false; }
               });
           });
@@ -930,12 +950,12 @@ $headerAccountDropdown = $customerLoggedIn ? '<div class="header-account-dropdow
                           window.location.assign(data.data.url);
                           return;
                       }
-                      Swal.fire({toast:true, position:'bottom-end', icon:'error', title:data.message || 'Không thể đăng nhập Zalo. Vui lòng thử lại.', showConfirmButton:false, timer:5000});
+                      Swal.fire({position:'center', icon:'error', title:data.message || 'Không thể đăng nhập Zalo. Vui lòng thử lại.', showConfirmButton:true, confirmButtonText:'Đóng', timer:4000, timerProgressBar:true});
                       busy = false;
                       jQuery('.js-zalo-login').removeAttr('aria-disabled');
                   },
                   error: function () {
-                      Swal.fire({toast:true, position:'bottom-end', icon:'error', title:'Không kết nối được máy chủ. Vui lòng thử lại.', showConfirmButton:false, timer:5000});
+                      Swal.fire({position:'center', icon:'error', title:'Không kết nối được máy chủ. Vui lòng thử lại.', showConfirmButton:true, confirmButtonText:'Đóng', timer:4000, timerProgressBar:true});
                       busy = false;
                       jQuery('.js-zalo-login').removeAttr('aria-disabled');
                   }
@@ -943,14 +963,155 @@ $headerAccountDropdown = $customerLoggedIn ? '<div class="header-account-dropdow
           });
       });
       </script>
+      <style>
+      /* Chuẩn hóa Banner Top dùng chung cho toàn bộ website (Trang chủ và tất cả các trang con) */
+      #slider {
+         width: 100%;
+         position: relative;
+         margin: 10px 0 20px 0;
+         background: #fff;
+         overflow: hidden;
+      }
+      #slider .is_pc {
+         max-width: 1270px;
+         margin: 0 auto !important;
+         padding: 0 10px;
+         box-sizing: border-box;
+      }
+      #slider .is_pc .slider {
+         width: 100%;
+         margin: 0 auto !important;
+         border-radius: 16px;
+         overflow: hidden;
+         box-shadow: 0 8px 24px rgba(21, 81, 145, 0.08);
+         border: 1px solid #e2e8f0;
+         background: #f8fafc;
+      }
+      #slider .is_pc .slider .slick-list,
+      #slider .is_pc .slider .slick-track {
+         width: 100%;
+         margin: 0 auto;
+      }
+      #slider .is_pc .slider a {
+         display: block !important;
+         width: 100%;
+         outline: none;
+         background: #f8fafc;
+         text-align: center;
+      }
+      #slider .is_pc .slider img {
+         width: 100% !important;
+         height: auto !important;
+         max-height: 400px !important;
+         display: block !important;
+         object-fit: cover !important;
+         object-position: center !important;
+         margin: 0 auto !important;
+      }
+
+      #slider .is_mobi {
+         width: 100%;
+      }
+      #slider .is_mobi .slider {
+         width: 100%;
+         margin: 0 auto;
+      }
+      #slider .is_mobi .slider img {
+         width: 100% !important;
+         height: auto !important;
+         max-height: 220px !important;
+         object-fit: cover !important;
+         margin: 0 auto !important;
+      }
+
+      /* Đảm bảo hiển thị đúng thiết bị cho banner */
+      @media (min-width: 768px) {
+         #slider .is_mobi { display: none !important; }
+         #slider .is_pc { display: block !important; }
+      }
+      @media (max-width: 767px) {
+         #slider .is_pc { display: none !important; }
+         #slider .is_mobi { display: block !important; }
+      }
+
+      /* Nút điều hướng chuyển slide banner */
+      #slider .slick_arrow {
+         position: absolute !important;
+         top: 50% !important;
+         transform: translateY(-50%) !important;
+         z-index: 99 !important;
+         width: 44px !important;
+         height: 44px !important;
+         border-radius: 50% !important;
+         background: rgba(255, 255, 255, 0.88) !important;
+         backdrop-filter: blur(6px) !important;
+         -webkit-backdrop-filter: blur(6px) !important;
+         border: 1px solid rgba(21, 81, 145, 0.15) !important;
+         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
+         color: #155191 !important;
+         display: flex !important;
+         align-items: center !important;
+         justify-content: center !important;
+         cursor: pointer !important;
+         transition: all 0.25s ease !important;
+         padding: 0 !important;
+         outline: none !important;
+      }
+      #slider .slick_arrow:hover {
+         background: #155191 !important;
+         color: #ffffff !important;
+         border-color: #155191 !important;
+         box-shadow: 0 6px 18px rgba(21, 81, 145, 0.35) !important;
+         transform: translateY(-50%) scale(1.08) !important;
+      }
+      #slider .sbanner_prev {
+         left: 20px !important;
+         right: auto !important;
+      }
+      #slider .sbanner_next {
+         right: 20px !important;
+         left: auto !important;
+      }
+      #slider .slick_arrow img,
+      .slick_arrow img {
+         display: none !important;
+         visibility: hidden !important;
+         width: 0 !important;
+         height: 0 !important;
+      }
+      #slider .slick_arrow svg {
+         width: 22px !important;
+         height: 22px !important;
+         display: block !important;
+         stroke: currentColor !important;
+         transition: stroke 0.25s ease !important;
+      }
+      @media (max-width: 767px) {
+         #slider .slick_arrow {
+            width: 34px !important;
+            height: 34px !important;
+         }
+         #slider .sbanner_prev {
+            left: 10px !important;
+         }
+         #slider .sbanner_next {
+            right: 10px !important;
+         }
+         #slider .slick_arrow svg {
+            width: 18px !important;
+            height: 18px !important;
+         }
+      }
+      </style>
       <main role="main">
       <section id="slider">
       <div class="is_mobi">
          <div class="slider">
             <?php 
             $slider_mb = $this->helper->get_banners("1");
+            if (empty($slider_mb)) { $slider_mb = $this->helper->get_banners("0"); }
             foreach($slider_mb as $item){ ?>
-            <a href="#" title="<?php echo $item->image_name; ?>"><img data-lazy="<?php echo XC_URL; ?>/uploads/images/<?php echo $item->image_url; ?>" alt="<?php echo $item->image_name; ?>"></a>
+            <a href="#" title="<?php echo $item->image_name; ?>"><img src="<?php echo XC_URL; ?>/uploads/images/<?php echo $item->image_url; ?>" data-lazy="<?php echo XC_URL; ?>/uploads/images/<?php echo $item->image_url; ?>" alt="<?php echo $item->image_name; ?>"></a>
             <?php } ?>
          </div>
       </div>
@@ -959,7 +1120,7 @@ $headerAccountDropdown = $customerLoggedIn ? '<div class="header-account-dropdow
             <?php
             $slider_pc = $this->helper->get_banners("0");
             foreach($slider_pc as $item){ ?>
-            <a href="#" title="<?php echo $item->image_name; ?>"><img data-lazy="<?php echo XC_URL; ?>/uploads/images/<?php echo $item->image_url; ?>" alt="<?php echo $item->image_name; ?>"></a>
+            <a href="#" title="<?php echo $item->image_name; ?>"><img src="<?php echo XC_URL; ?>/uploads/images/<?php echo $item->image_url; ?>" data-lazy="<?php echo XC_URL; ?>/uploads/images/<?php echo $item->image_url; ?>" alt="<?php echo $item->image_name; ?>"></a>
             <?php } ?>
          </div>
       </div>

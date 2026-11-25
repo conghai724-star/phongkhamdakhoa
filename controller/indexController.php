@@ -23,6 +23,14 @@ Class indexController Extends baseController
 		$db->query("SELECT * FROM hicrm_images WHERE image_status NOT IN (99) AND image_category = '2' ");
 		$this->view->data['pic'] = $db->fetch_object();
 		
+		// Sản phẩm mới nhất hiển thị slider trang chủ
+		$db->query("SELECT *, p.id as pid FROM hicrm_products as p 
+			LEFT JOIN hicrm_product_categories pc ON p.product_category = pc.id 
+			LEFT JOIN hicrm_units u ON p.product_unit = u.id 
+			WHERE p.product_status NOT IN (99) 
+			ORDER BY p.product_created_time DESC, p.id DESC LIMIT 15");
+		$this->view->data['new_products'] = $db->fetch_object();
+
 		$this->view->show("index");
 		
 	}

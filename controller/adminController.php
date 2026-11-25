@@ -149,25 +149,51 @@ Class adminController extends baseController
 	}
 	//end
 	public function gioithieu($para){
-		$id = $para[1];
-		if(!(isset($_SESSION['user']['id']) && $_SESSION['user']['id'] != "")){ header("Location: ".XC_URL."/admin/login"); }
+		if(!(isset($_SESSION['user']['id']) && $_SESSION['user']['id'] != "")){ header("Location: ".XC_URL."/admin/login"); return; }
 		global $db;
-		// $db->query("SELECT *, t.id as tid FROM hicrm_type as t 
-		// 			LEFT JOIN hicrm_status as s ON u.user_status = s.id
-		// 			LEFT JOIN hicrm_user_groups as g ON u.user_group = g.id
-		// 			LEFT JOIN hicrm_departments as d ON u.user_dept = d.id
-		// 			 WHERE u.user_status NOT IN(99) and u.id = '$id'
-		// 			");
-		$db->query("SELECT *, i.id as iid FROM hicrm_introduce  as i
-					LEFT JOIN hicrm_categories as c ON i.introduce_category = c.id
-					where i.id = '".$id."' " );
-		$introduce = $db->fetch_object(true);
-		$db->query("SELECT * FROM hicrm_introduce ORDER BY introduce_orderby ASC");		
-		$category = $db->fetch_object();
-		$this->view->data['id'] = $id;
-		$this->view->data['introduce'] = $introduce;
-		$this->view->data['category'] = $category;
-		$this->view->show('backend/gioithieu');
+		$id = isset($para[1]) ? (int)$para[1] : 0;
+		if ($id > 0) {
+			// Soạn thảo nội dung bài viết giới thiệu
+			$db->query("SELECT i.*, c.category_name FROM hicrm_introduce as i LEFT JOIN hicrm_categories as c ON i.introduce_category = c.id WHERE i.id = '".$id."'");
+			$introduce = $db->fetch_object(true);
+			$this->view->data['active_menu'] = 'gioithieu';
+			$this->view->data['id'] = $id;
+			$this->view->data['introduce'] = $introduce;
+			$this->view->data['page_type'] = 'gioithieu';
+			$this->view->show('backend/gioithieu');
+			return;
+		}
+
+		// Danh sách riêng cho các bài giới thiệu phòng khám
+		$db->query("SELECT i.*, u.user_fullname FROM hicrm_introduce AS i LEFT JOIN hicrm_users AS u ON i.introduce_uid = u.id WHERE (i.introduce_status IS NULL OR i.introduce_status NOT IN (99)) AND (i.introduce_category IN (1, 2, 3, 4, 5, 8) OR i.id IN (1, 2, 3, 4, 5)) ORDER BY i.introduce_orderby ASC, i.id ASC");
+		$introduces = $db->fetch_object();
+		$this->view->data['active_menu'] = 'gioithieu';
+		$this->view->data['introduces'] = $introduces;
+		$this->view->show('backend/gioithieu_list');
+	}
+
+	public function chinhsach($para){
+		if(!(isset($_SESSION['user']['id']) && $_SESSION['user']['id'] != "")){ header("Location: ".XC_URL."/admin/login"); return; }
+		global $db;
+		$id = isset($para[1]) ? (int)$para[1] : 0;
+		if ($id > 0) {
+			// Soạn thảo nội dung chính sách
+			$db->query("SELECT i.*, c.category_name FROM hicrm_introduce as i LEFT JOIN hicrm_categories as c ON i.introduce_category = c.id WHERE i.id = '".$id."'");
+			$introduce = $db->fetch_object(true);
+			$this->view->data['active_menu'] = 'chinhsach';
+			$this->view->data['id'] = $id;
+			$this->view->data['introduce'] = $introduce;
+			$this->view->data['page_type'] = 'chinhsach';
+			$this->view->show('backend/gioithieu');
+			return;
+		}
+
+		// Danh sách riêng cho các chính sách nhà thuốc (loại trừ các bài giới thiệu và BMI)
+		$db->query("SELECT i.*, u.user_fullname FROM hicrm_introduce AS i LEFT JOIN hicrm_users AS u ON i.introduce_uid = u.id WHERE (i.introduce_status IS NULL OR i.introduce_status NOT IN (99)) AND (i.introduce_category = 9 OR i.id IN (6, 8) OR (i.introduce_category NOT IN (1, 2, 3, 4, 5, 8, 10) AND i.id NOT IN (1, 2, 3, 4, 5, 7))) ORDER BY i.introduce_orderby ASC, i.id ASC");
+		$policies = $db->fetch_object();
+		$this->view->data['active_menu'] = 'chinhsach';
+		$this->view->data['policies'] = $policies;
+		$this->view->show('backend/chinhsach');
 	}
 	public function dmType(){
 		global $db;
@@ -264,6 +290,128 @@ Class adminController extends baseController
 		$this->view->data["filter_name"] = $name;
 		$this->view->data["filter_date"] = $date;
 		$this->view->show("backend/booking_internal");
+	}
+
+	public function customers($para = array()){
+		global $db;
+		if(!(isset($_SESSION['user']['id']) && $_SESSION['user']['id'] != "")){ header("Location: ".XC_URL."/admin/login"); return; }
+		$this->view->data["active_menu"] = "customers";
+
+		// Sub-action: Chi tiết khách hàng
+		if(isset($para[1]) && $para[1] === "detail"){
+			$id = isset($para[2]) ? intval($para[2]) : 0;
+			$db->query("SELECT * FROM hicrm_users WHERE id = '".$id."' AND user_group = 0 LIMIT 1");
+			$customer = $db->fetch_object(true);
+			if(!$customer){
+				header("Location: ".XC_URL."/admin/customers");
+				return;
+			}
+			$this->view->data["customer"] = $customer;
+
+			// Lấy toàn bộ lịch sử đơn thuốc của khách hàng (theo user_id hoặc theo SĐT)
+			$phone = !empty($customer->user_phone) ? $db->escapestring($customer->user_phone) : '';
+			$orderWhere = "user_id = '".$customer->id."'";
+			if($phone !== ''){
+				$orderWhere = "(user_id = '".$customer->id."' OR (user_id IS NULL AND phone = '".$phone."'))";
+			}
+			$db->query("SELECT * FROM booking_internal WHERE ".$orderWhere." ORDER BY created_at DESC");
+			$orders = $db->fetch_object();
+			$this->view->data["orders"] = !empty($orders) ? $orders : array();
+
+			// Thống kê nhanh của khách này
+			$totalSpent = 0;
+			$totalPointsUsed = 0;
+			$totalPointsEarned = 0;
+			$addresses = array();
+			if(!empty($customer->user_address)) $addresses[] = $customer->user_address;
+			foreach($this->view->data["orders"] as $ord){
+				$totalSpent += (float)$ord->total_amount;
+				$totalPointsUsed += (int)$ord->points_used;
+				$totalPointsEarned += (int)$ord->points_earned;
+				if(!empty($ord->address) && !in_array($ord->address, $addresses, true)){
+					$addresses[] = $ord->address;
+				}
+			}
+			$this->view->data["total_spent"] = $totalSpent;
+			$this->view->data["total_points_used"] = $totalPointsUsed;
+			$this->view->data["total_points_earned"] = $totalPointsEarned;
+			$this->view->data["shipping_addresses"] = $addresses;
+
+			$this->view->show("backend/customer_detail_pharmacy");
+			return;
+		}
+
+		// Danh sách khách hàng kèm bộ lọc & tìm kiếm
+		$keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
+		$tier = isset($_GET['tier']) ? trim($_GET['tier']) : '';
+		$status = isset($_GET['status']) ? trim($_GET['status']) : '';
+
+		$where = array("u.user_group = 0", "u.user_status != 99");
+		if($keyword !== ''){
+			$kw = $db->escapestring($keyword);
+			$where[] = "(u.user_fullname LIKE '%".$kw."%' OR u.user_phone LIKE '%".$kw."%' OR u.user_email LIKE '%".$kw."%' OR u.user_address LIKE '%".$kw."%')";
+		}
+		if($status !== '' && in_array($status, array('1', '2'), true)){
+			$where[] = "u.user_status = '".intval($status)."'";
+		}
+
+		$sql = "SELECT 
+			u.*,
+			COALESCE(orders.order_count, 0) AS total_orders,
+			COALESCE(orders.total_spent, 0) AS total_spent,
+			orders.last_order_date,
+			orders.last_order_address
+		FROM hicrm_users u
+		LEFT JOIN (
+			SELECT 
+				COALESCE(b.user_id, match_u.id) AS matched_user_id,
+				COUNT(b.id) AS order_count,
+				SUM(b.total_amount) AS total_spent,
+				MAX(b.created_at) AS last_order_date,
+				SUBSTRING_INDEX(GROUP_CONCAT(b.address ORDER BY b.id DESC SEPARATOR '|||'), '|||', 1) AS last_order_address
+			FROM booking_internal b
+			LEFT JOIN hicrm_users match_u ON b.user_id IS NULL AND b.phone IS NOT NULL AND b.phone != '' AND match_u.user_phone = b.phone AND match_u.user_group = 0
+			GROUP BY matched_user_id
+		) orders ON orders.matched_user_id = u.id
+		WHERE ".implode(" AND ", $where);
+
+		if($tier === 'vip'){
+			$sql .= " AND COALESCE(orders.total_spent, 0) >= 2000000";
+		} elseif($tier === 'loyal'){
+			$sql .= " AND COALESCE(orders.total_spent, 0) >= 500000 AND COALESCE(orders.total_spent, 0) < 2000000";
+		} elseif($tier === 'new'){
+			$sql .= " AND COALESCE(orders.total_spent, 0) < 500000";
+		}
+
+		$sql .= " ORDER BY total_spent DESC, u.id DESC";
+
+		$db->query($sql);
+		$customers = $db->fetch_object();
+		$this->view->data["customers"] = !empty($customers) ? $customers : array();
+
+		// Thống kê tổng quan KPI
+		$db->query("SELECT 
+			COUNT(id) AS total_customers,
+			COALESCE(SUM(loyalty_points), 0) AS total_points,
+			SUM(CASE WHEN user_register_time >= DATE_FORMAT(NOW() ,'%Y-%m-01') THEN 1 ELSE 0 END) AS new_this_month
+		FROM hicrm_users WHERE user_group = 0 AND user_status != 99");
+		$kpiUser = $db->fetch_object(true);
+
+		$db->query("SELECT COALESCE(SUM(total_amount), 0) AS total_revenue FROM booking_internal");
+		$kpiRev = $db->fetch_object(true);
+
+		$this->view->data["kpi"] = array(
+			'total_customers' => $kpiUser ? (int)$kpiUser->total_customers : 0,
+			'total_points' => $kpiUser ? (int)$kpiUser->total_points : 0,
+			'new_this_month' => $kpiUser ? (int)$kpiUser->new_this_month : 0,
+			'total_revenue' => $kpiRev ? (float)$kpiRev->total_revenue : 0
+		);
+
+		$this->view->data["filter_keyword"] = $keyword;
+		$this->view->data["filter_tier"] = $tier;
+		$this->view->data["filter_status"] = $status;
+
+		$this->view->show("backend/customers_pharmacy");
 	}
 	// public function news(){
 	// 	global $db;

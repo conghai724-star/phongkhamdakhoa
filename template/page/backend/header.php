@@ -32,6 +32,147 @@
 
 <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"> -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.3/dist/sweetalert2.min.css">
+<style>
+/* Chuẩn hóa giao diện SweetAlert2 trung tâm cao cấp */
+.swal2-container {
+    z-index: 100200 !important;
+    background: rgba(15, 23, 42, 0.48) !important;
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+}
+.swal2-container .swal2-popup {
+    background: #ffffff !important;
+    border-radius: 20px !important;
+    padding: 30px 24px 24px !important;
+    width: calc(100% - 32px) !important;
+    max-width: 400px !important;
+    margin: 0 auto !important;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(15, 23, 42, 0.06) !important;
+    border: none !important;
+    overflow: hidden !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+}
+.swal2-container .swal2-icon {
+    width: 62px !important;
+    height: 62px !important;
+    margin: 0 auto 16px !important;
+    border-width: 3px !important;
+    border-style: solid !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    zoom: 1 !important;
+}
+.swal2-container .swal2-icon.swal2-success .swal2-success-circular-line-left,
+.swal2-container .swal2-icon.swal2-success .swal2-success-circular-line-right,
+.swal2-container .swal2-icon.swal2-success .swal2-success-fix,
+.swal2-container .swal2-icon.swal2-success .swal2-success-ring {
+    display: none !important;
+}
+.swal2-container .swal2-icon.swal2-success {
+    border-color: #10b981 !important;
+    color: #10b981 !important;
+}
+.swal2-container .swal2-icon.swal2-success [class^='swal2-success-line'] {
+    background-color: #10b981 !important;
+    height: 3.5px !important;
+    border-radius: 2px !important;
+    display: block !important;
+    position: absolute !important;
+    z-index: 2 !important;
+}
+.swal2-container .swal2-icon.swal2-success .swal2-success-line-tip {
+    top: 32px !important;
+    left: 12px !important;
+    width: 18px !important;
+    transform: rotate(45deg) !important;
+}
+.swal2-container .swal2-icon.swal2-success .swal2-success-line-long {
+    top: 28px !important;
+    right: 8px !important;
+    width: 31px !important;
+    transform: rotate(-45deg) !important;
+}
+.swal2-container .swal2-icon.swal2-error {
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+    position: relative !important;
+}
+.swal2-container .swal2-icon.swal2-error .swal2-x-mark {
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.swal2-container .swal2-icon.swal2-error .swal2-x-mark-line-left {
+    display: block !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 28px !important;
+    height: 3.5px !important;
+    margin: 0 !important;
+    border-radius: 2px !important;
+    background-color: #ef4444 !important;
+    transform: translate(-50%, -50%) rotate(45deg) !important;
+}
+.swal2-container .swal2-icon.swal2-error .swal2-x-mark-line-right {
+    display: block !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 28px !important;
+    height: 3.5px !important;
+    margin: 0 !important;
+    border-radius: 2px !important;
+    background-color: #ef4444 !important;
+    transform: translate(-50%, -50%) rotate(-45deg) !important;
+}
+.swal2-container .swal2-title {
+    font-family: inherit !important;
+    font-size: 16.5px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    line-height: 1.45 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+}
+.swal2-container .swal2-html-container {
+    font-family: inherit !important;
+    font-size: 14px !important;
+    color: #64748b !important;
+    line-height: 1.55 !important;
+    margin: 8px 0 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+}
+.swal2-container .swal2-actions button.swal2-confirm {
+    background: #1760a5 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    padding: 10px 26px !important;
+    box-shadow: 0 4px 14px rgba(23, 96, 165, 0.25) !important;
+}
+.swal2-container .swal2-timer-progress-bar {
+    background: #10b981 !important;
+    height: 3px !important;
+    border-radius: 0 0 20px 20px !important;
+}
+.swal2-container .swal2-popup.swal2-icon-error .swal2-timer-progress-bar {
+    background: #ef4444 !important;
+}
+</style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -283,6 +424,9 @@
                      <li class="<?php echo ($active_menu == "booking_internal")? "active" : "";?>">
                         <a href="<?php echo XC_URL;?>/admin/booking_internal"><i data-feather="shopping-bag"></i> <span>Đơn thuốc nội bộ</span></a>
                      </li>
+                     <li class="<?php echo ($active_menu == "customers")? "active" : "";?>">
+                        <a href="<?php echo XC_URL;?>/admin/customers"><i data-feather="users"></i> <span>Quản lý Khách hàng</span></a>
+                     </li>
                      <li>
                         <a href="<?php echo XC_URL?>/admin/products"><i data-feather="plus-square"></i> <span>Nhà thuốc</span></a>
                      </li>
@@ -297,20 +441,35 @@
                      <li class="menu-title">
                         <span>Hệ thống</span>
                      </li>
-                     <li class="submenu">
-                        <a href="#"><i data-feather="pie-chart"></i> <span>Quản trị Trang tĩnh</span> <span class="menu-arrow"></span></a>
-                        <ul>
-                            <?php
-                            global $db;
-                            $db->query("SELECT * FROM hicrm_introduce ORDER BY introduce_orderby ASC");		
-		                    $category = $db->fetch_object();
-		                    foreach($category as $category){
-		                    ?>
-                            <a href='<?php echo XC_URL?>/admin/gioithieu/<?php echo $category->id;?>'  value='<?php echo $category->category_name;?>'><?php echo $category->introduce_name;?></a>
-                           <?php }?>
-                           <!-- <li><a href="expenses-report.html">Liên hệ</a></li> -->
-                        </ul>
-                     </li>
+                      <li class="submenu <?php echo (isset($active_menu) && $active_menu === 'gioithieu') ? 'active' : ''; ?>">
+                          <a href="#"><i data-feather="info"></i> <span>Quản lý Giới thiệu</span> <span class="menu-arrow"></span></a>
+                          <ul>
+                             <li><a href="<?php echo XC_URL; ?>/admin/gioithieu" style="font-weight: 700; color: #13467d;"><i class="fas fa-list"></i> Danh sách bài giới thiệu</a></li>
+                             <?php
+                             global $db;
+                             $db->query("SELECT * FROM hicrm_introduce WHERE (introduce_status IS NULL OR introduce_status NOT IN (99)) AND (introduce_category IN (1, 2, 3, 4, 5, 8) OR id IN (1, 2, 3, 4, 5)) ORDER BY introduce_orderby ASC, id ASC");		
+                             $introItems = $db->fetch_object();
+                             if (!empty($introItems)) {
+                                 foreach($introItems as $introItem){
+                             ?>
+                             <li><a href="<?php echo XC_URL; ?>/admin/gioithieu/<?php echo $introItem->id; ?>"><?php echo htmlspecialchars($introItem->introduce_name, ENT_QUOTES, 'UTF-8'); ?></a></li>
+                             <?php }} ?>
+                          </ul>
+                       </li>
+                      <li class="submenu <?php echo (isset($active_menu) && $active_menu === 'chinhsach') ? 'active' : ''; ?>">
+                          <a href="#"><i data-feather="file-text"></i> <span>Quản lý Chính sách</span> <span class="menu-arrow"></span></a>
+                          <ul>
+                             <li><a href="<?php echo XC_URL; ?>/admin/chinhsach" style="font-weight: 700; color: #13467d;"><i class="fas fa-list"></i> Danh sách tất cả chính sách</a></li>
+                             <?php
+                             $db->query("SELECT * FROM hicrm_introduce WHERE (introduce_status IS NULL OR introduce_status NOT IN (99)) AND (introduce_category = 9 OR id IN (6, 8) OR (introduce_category NOT IN (1, 2, 3, 4, 5, 8, 10) AND id NOT IN (1, 2, 3, 4, 5, 7))) ORDER BY introduce_orderby ASC, id ASC");		
+                             $policyItems = $db->fetch_object();
+                             if (!empty($policyItems)) {
+                                 foreach($policyItems as $pItem){
+                             ?>
+                             <li><a href="<?php echo XC_URL; ?>/admin/chinhsach/<?php echo $pItem->id; ?>"><?php echo htmlspecialchars($pItem->introduce_name, ENT_QUOTES, 'UTF-8'); ?></a></li>
+                             <?php }} ?>
+                          </ul>
+                       </li>
                      <!-- <li class="submenu"> -->
                      <!--   <a href="#"><i data-feather="home"></i> <span>Quản trị trang chủ</span> <span class="menu-arrow"></span></a>-->
                      <!--   <ul>-->

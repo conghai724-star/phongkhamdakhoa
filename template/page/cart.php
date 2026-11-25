@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $cart_items = is_array($cart_items ?? null) ? $cart_items : array();
 $cart_vouchers = is_array($cart_vouchers ?? null) ? $cart_vouchers : array();
 $cart_count = isset($cart_count) ? (int)$cart_count : 0;
@@ -317,9 +317,25 @@ require "header_new.php";
   }
   .mob-bar-main {
     padding: 10px 14px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+  .mob-btn-submit {
+    background: #1760a5;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14.5px;
+    font-weight: 800;
+    touch-action: manipulation;
+    box-shadow: 0 4px 12px rgba(23, 96, 165, 0.28);
+    cursor: pointer;
+  }
+  .mob-btn-submit:active {
+    transform: scale(0.97);
   }
   .mob-btn-submit {
     background: #1760a5;
@@ -769,13 +785,13 @@ require "header_new.php";
   function showCartToast(message, type) {
     if (typeof Swal === 'undefined' || !Swal.fire) return;
     Swal.fire({
-      toast: true,
-      position: 'bottom-end',
+      position: 'center',
       icon: type === 'error' ? 'error' : 'success',
-      text: message,
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true
+      title: message,
+      showConfirmButton: type === 'error',
+      confirmButtonText: 'Đóng',
+      timer: type === 'error' ? undefined : 2000,
+      timerProgressBar: type !== 'error'
     });
   }
 
@@ -1341,6 +1357,10 @@ require "header_new.php";
       updateVoucherDisplay();
       recalcSummary();
       showCartToast(response.message || 'Đặt thuốc thành công.', 'success');
+      setTimeout(function() {
+        var orderId = (response.order && response.order.id) ? response.order.id : '';
+        window.location.assign(cartApiBase + '/dat-hang-thanh-cong.html?id=' + orderId);
+      }, 800);
     }).fail(function(xhr) {
       var message = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Không thể kết nối máy chủ. Vui lòng thử lại.';
       showCartToast(message, 'error');

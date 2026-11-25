@@ -229,21 +229,121 @@ Class apiController extends baseController
 	}
 	public function updateIntroduce(){
 		global $db;
-		$result = array();
-		$id = $_POST['type_id'];
+		@error_reporting(0);
+		while (ob_get_level()) { @ob_end_clean(); }
+		header('Content-Type: application/json; charset=utf-8');
 
-		$page_content = $db->escapestring($_POST['content']);
-		// var_dump($page_content);
-		$page_uid = $_POST['userid'];
-		$page_status = 1;
+		$adminId = 0;
+		if (isset($_SESSION['user']['id']) && $_SESSION['user']['id'] != '') {
+			$adminId = (int)$_SESSION['user']['id'];
+		} elseif (isset($_SESSION['staff']['id']) && $_SESSION['staff']['id'] != '') {
+			$adminId = (int)$_SESSION['staff']['id'];
+		}
+
+		if ($adminId <= 0) {
+			echo json_encode(array('status' => 403, 'message' => 'Bạn chưa đăng nhập hoặc không có quyền.'));
+			return;
+		}
+
+		$result = array();
+		$id = isset($_POST['type_id']) ? (int)$_POST['type_id'] : 0;
+		if ($id <= 0) {
+			echo json_encode(array('status' => 422, 'message' => 'Mã chính sách không hợp lệ.'));
+			return;
+		}
+
+		$title = isset($_POST['title']) ? trim($_POST['title']) : '';
+		$page_uid = $adminId;
 		$page_created_date = date('Y-m-d H:i:s');
-		// echo "UPDATE hicrm_introduce SET introduce_id_type ='".$id."',introduce_content='".$page_content."',introduce_uid = '".$page_uid."',introduce_created_date='".$page_created_date."' WHERE introduce_id_type ='".$id."'";
-		$db->query("UPDATE hicrm_introduce SET introduce_content='".$page_content."',introduce_uid = '".$page_uid."',introduce_created_date='".$page_created_date."' WHERE id = '".$id."'");
-		
-		$result['message'] = "Thành công";
+
+		$updates = array();
+		if (isset($_POST['content'])) {
+			$updates[] = "introduce_content = '" . $db->escapestring($_POST['content']) . "'";
+		}
+		if ($title !== '') {
+			$updates[] = "introduce_name = '" . $db->escapestring($title) . "'";
+		}
+		$updates[] = "introduce_uid = '" . $page_uid . "'";
+		$updates[] = "introduce_created_date = '" . $page_created_date . "'";
+
+		$db->query("UPDATE hicrm_introduce SET " . implode(', ', $updates) . " WHERE id = '" . $id . "'");
+
+		$result['message'] = "Lưu chính sách thành công";
 		$result['status'] = 200;
-		
-		echo json_encode($result);
+		$result['success'] = true;
+		echo json_encode($result, JSON_UNESCAPED_UNICODE);
+	}
+
+	public function addIntroduce(){
+		global $db;
+		@error_reporting(0);
+		while (ob_get_level()) { @ob_end_clean(); }
+		header('Content-Type: application/json; charset=utf-8');
+
+		$adminId = 0;
+		if (isset($_SESSION['user']['id']) && $_SESSION['user']['id'] != '') {
+			$adminId = (int)$_SESSION['user']['id'];
+		} elseif (isset($_SESSION['staff']['id']) && $_SESSION['staff']['id'] != '') {
+			$adminId = (int)$_SESSION['staff']['id'];
+		}
+
+		if ($adminId <= 0) {
+			echo json_encode(array('status' => 403, 'message' => 'Bạn không có quyền thực hiện thao tác này.'));
+			return;
+		}
+		$name = isset($_POST['name']) ? trim($_POST['name']) : '';
+		if(mb_strlen($name) < 2){
+			echo json_encode(array('status' => 422, 'message' => 'Vui lòng nhập tên chính sách (tối thiểu 2 ký tự).'));
+			return;
+		}
+		$cat = isset($_POST['category']) ? (int)$_POST['category'] : 9;
+		$uid = $adminId;
+		$now = date('Y-m-d H:i:s');
+
+		$db->query("SELECT MAX(introduce_orderby) AS max_order FROM hicrm_introduce");
+		$maxRow = $db->fetch_object(true);
+		$order = $maxRow ? ((int)$maxRow->max_order + 1) : 1;
+
+		$initialContent = $db->escapestring('<h3>I. Quy định chung</h3><p>Nội dung chính sách đang được cập nhật...</p>');
+		$nameEsc = $db->escapestring($name);
+		$db->query("INSERT INTO hicrm_introduce (introduce_category, introduce_name, introduce_content, introduce_uid, introduce_orderby, introduce_created_date) 
+			VALUES ('".$cat."', '".$nameEsc."', '".$initialContent."', '".$uid."', '".$order."', '".$now."')");
+		$newId = (int)$db->insert_id();
+
+		echo json_encode(array(
+			'status' => 200,
+			'success' => true,
+			'message' => 'Đã thêm chính sách mới thành công.',
+			'id' => $newId,
+			'redirect' => XC_URL . '/admin/gioithieu/' . $newId
+		));
+	}
+
+	public function deleteIntroduce(){
+		global $db;
+		@error_reporting(0);
+		while (ob_get_level()) { @ob_end_clean(); }
+		header('Content-Type: application/json; charset=utf-8');
+
+		$adminId = 0;
+		if (isset($_SESSION['user']['id']) && $_SESSION['user']['id'] != '') {
+			$adminId = (int)$_SESSION['user']['id'];
+		} elseif (isset($_SESSION['staff']['id']) && $_SESSION['staff']['id'] != '') {
+			$adminId = (int)$_SESSION['staff']['id'];
+		}
+
+		if ($adminId <= 0) {
+			echo json_encode(array('status' => 403, 'message' => 'Bạn không có quyền thực hiện thao tác này.'));
+			return;
+		}
+		$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+		if ($id <= 0) {
+			echo json_encode(array('status' => 422, 'message' => 'Mã chính sách không hợp lệ.'));
+			return;
+		}
+		// Xóa mềm: lưu trạng thái 99 theo quy chuẩn hệ thống
+		$db->query("UPDATE hicrm_introduce SET introduce_status = 99 WHERE id = '".$id."'");
+		echo json_encode(array('status' => 200, 'success' => true, 'message' => 'Đã xóa chính sách thành công.'));
 	}
 	public function loadIntroduce(){
 		global $db;
@@ -663,6 +763,8 @@ Class apiController extends baseController
 		}
 		$db->query("COMMIT");
 		$this->helper->clear_cart();
+		$_SESSION['last_order_id'] = $orderId;
+		$_SESSION['last_order_token'] = md5($orderId . '_' . $phone . '_' . XC_URL);
 		$this->respondJson(array(
 			'status' => 200,
 			'message' => 'Đã gửi đơn đặt thuốc thành công. Nhà thuốc sẽ liên hệ xác nhận.',
@@ -3356,8 +3458,14 @@ Class apiController extends baseController
             return;
         }
 
-        $account = $db->escapestring(trim($account));
-        $db->query("SELECT * FROM hicrm_users WHERE (user_email = '".$account."' OR user_username = '".$account."' OR user_phone = '".$account."') LIMIT 1");
+        $accountTrim = trim($account);
+        $cleanPhone = preg_replace('/[\s.\-]/', '', $accountTrim);
+        $cleanPhone = preg_replace('/^(?:\+84|84)/', '0', $cleanPhone);
+
+        $accountEsc = $db->escapestring($accountTrim);
+        $phoneEsc = $db->escapestring($cleanPhone);
+
+        $db->query("SELECT * FROM hicrm_users WHERE (user_email = '".$accountEsc."' OR user_username = '".$accountEsc."' OR user_phone = '".$accountEsc."' OR user_phone = '".$phoneEsc."' OR user_username = '".$phoneEsc."') LIMIT 1");
         if (!$db->num_row()) {
             $result['message'] = 'Tài khoản không tồn tại trên hệ thống.';
             echo json_encode($result, JSON_UNESCAPED_UNICODE);
@@ -3675,6 +3783,18 @@ Class apiController extends baseController
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['customer']['id']) && is_string($csrf) && !empty($_SESSION['customer_csrf']) && hash_equals($_SESSION['customer_csrf'], $csrf)) {
             $phone = isset($_POST['phone']) && is_string($_POST['phone']) ? preg_replace('/[\s.\-]/', '', trim($_POST['phone'])) : '';
             $phone = preg_replace('/^(?:\+84|84)/', '0', $phone);
+            
+            $province = isset($_POST['province']) && is_string($_POST['province']) ? trim($_POST['province']) : '';
+            $ward = isset($_POST['ward']) && is_string($_POST['ward']) ? trim($_POST['ward']) : '';
+            $specificAddress = isset($_POST['specific_address']) && is_string($_POST['specific_address']) ? trim($_POST['specific_address']) : '';
+            $rawAddress = isset($_POST['address']) && is_string($_POST['address']) ? trim($_POST['address']) : '';
+
+            $address = $rawAddress;
+            if ($specificAddress !== '' || $ward !== '' || $province !== '') {
+                $parts = array_filter(array($specificAddress, $ward, $province));
+                $address = implode(', ', $parts);
+            }
+
             if (!preg_match('/^0[35789][0-9]{8}$/D', $phone)) {
                 $result['message'] = 'Vui lòng nhập số điện thoại di động Việt Nam hợp lệ (10 số).';
             } else {
@@ -3691,14 +3811,15 @@ Class apiController extends baseController
                         $stmt = $conn->prepare('SELECT id FROM hicrm_users WHERE id = ? AND user_status = 1 LIMIT 1');
                         $stmt->bind_param('i', $id); $stmt->execute();
                         if (!$stmt->get_result()->fetch_assoc()) throw new Exception('Account unavailable');
-                        $stmt = $conn->prepare('UPDATE hicrm_users SET user_phone = ? WHERE id = ? AND user_status = 1');
-                        $stmt->bind_param('si', $phone, $id); $stmt->execute();
+                        $stmt = $conn->prepare('UPDATE hicrm_users SET user_phone = ?, user_address = ? WHERE id = ? AND user_status = 1');
+                        $stmt->bind_param('ssi', $phone, $address, $id); $stmt->execute();
                         $_SESSION['customer']['phone'] = $phone;
-                        $result = array('success' => true, 'message' => 'Đã cập nhật số điện thoại.', 'data' => array('url' => XC_URL));
+                        $_SESSION['customer']['address'] = $address;
+                        $result = array('success' => true, 'message' => 'Đã lưu thông tin tài khoản thành công.', 'data' => array('url' => XC_URL, 'phone' => $phone, 'address' => $address));
                     }
                     $conn->close();
                 } catch (Throwable $e) {
-                    $result['message'] = 'Không thể lưu số điện thoại. Vui lòng thử lại sau.';
+                    $result['message'] = 'Không thể lưu thông tin. Vui lòng thử lại sau.';
                 }
             }
         }
@@ -4340,54 +4461,156 @@ Class apiController extends baseController
             }
         }
 
-        $fullname  = isset($_POST['fullname']) ? trim($_POST['fullname']) : '';
-        $firstname = isset($_POST['firstname']) ? trim($_POST['firstname']) : '';
-        $lastname  = isset($_POST['lastname']) ? trim($_POST['lastname']) : '';
+        $rawFullname = isset($_POST['fullname']) ? (string)$_POST['fullname'] : '';
+        $fullname = trim(strip_tags($rawFullname));
+        $firstname = isset($_POST['firstname']) ? trim(strip_tags((string)$_POST['firstname'])) : '';
+        $lastname  = isset($_POST['lastname']) ? trim(strip_tags((string)$_POST['lastname'])) : '';
         if ($fullname === '' && ($firstname !== '' || $lastname !== '')) {
             $fullname = trim($firstname . ' ' . $lastname);
         }
 
-        $phone = isset($_POST['phone']) ? preg_replace('/[\s.\-]/', '', trim($_POST['phone'])) : '';
+        if (mb_strlen($fullname) === 0) {
+            $result['message'] = 'Vui lòng nhập Họ và tên của bạn.';
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        if (mb_strlen($fullname) < 2) {
+            $result['message'] = 'Họ và tên quá ngắn. Vui lòng nhập tối thiểu 2 ký tự.';
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        if (preg_match('/[<>{}()\[\]\\\/^$*~`]/', $rawFullname)) {
+            $result['message'] = 'Họ và tên không hợp lệ. Vui lòng không nhập ký tự đặc biệt.';
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        $rawPhone = isset($_POST['phone']) ? trim((string)$_POST['phone']) : '';
+        if ($rawPhone === '') {
+            $result['message'] = 'Vui lòng nhập số điện thoại liên hệ.';
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        $phone = preg_replace('/[\s.\-]/', '', $rawPhone);
         $phone = preg_replace('/^(?:\+84|84)/', '0', $phone);
+
+        if (!preg_match('/^[0-9]+$/', $phone)) {
+            $result['message'] = 'Số điện thoại chỉ được chứa các chữ số (0 - 9).';
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        if (!preg_match('/^(03|05|07|08|09)/', $phone)) {
+            $result['message'] = 'Số điện thoại không hợp lệ. Vui lòng dùng các đầu số di động Việt Nam: 03, 05, 07, 08 hoặc 09.';
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        $phoneLen = strlen($phone);
+        if ($phoneLen < 10) {
+            $result['message'] = 'Số điện thoại chưa đủ 10 chữ số (Quý khách mới nhập ' . $phoneLen . ' số).';
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        if ($phoneLen > 10) {
+            $result['message'] = 'Số điện thoại không được vượt quá 10 chữ số (Hiện đang có ' . $phoneLen . ' số).';
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
         $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $result['message'] = 'Địa chỉ email không đúng định dạng (Ví dụ: yourname@gmail.com).';
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
         $password = isset($_POST['password']) ? (string)$_POST['password'] : '';
         $repassword = isset($_POST['repassword']) ? (string)$_POST['repassword'] : '';
 
-        if (mb_strlen($fullname) < 2) {
-            $result['message'] = 'Vui lòng nhập họ và tên (tối thiểu 2 ký tự).';
+        if ($password === '') {
+            $result['message'] = 'Vui lòng nhập mật khẩu đăng ký.';
             echo json_encode($result, JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        if (!preg_match('/^0[35789][0-9]{8}$/D', $phone)) {
-            $result['message'] = 'Vui lòng nhập số điện thoại di động Việt Nam hợp lệ (10 chữ số, ví dụ: 0912345678).';
+        $pwdMissing = array();
+        if (strlen($password) < 8) {
+            $pwdMissing[] = 'Tối thiểu 8 ký tự (hiện có ' . strlen($password) . ' ký tự)';
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            $pwdMissing[] = 'Chữ in hoa (A-Z)';
+        }
+        if (!preg_match('/[a-z]/', $password)) {
+            $pwdMissing[] = 'Chữ thường (a-z)';
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            $pwdMissing[] = 'Chữ số (0-9)';
+        }
+        if (!preg_match('/[^a-zA-Z0-9]/', $password)) {
+            $pwdMissing[] = 'Ký tự đặc biệt (@, #, $, %, !, *, ...)';
+        }
+
+        if (!empty($pwdMissing)) {
+            $htmlMsg = '<div style="text-align: left; font-size: 14px; line-height: 1.6;">'
+                . '<p style="margin: 0 0 8px 0; font-weight: 600; color: #1e293b;">Mật khẩu chưa đạt yêu cầu an toàn. Hiện đang còn thiếu:</p>'
+                . '<ul style="margin: 0; padding-left: 20px; color: #dc2626;">';
+            foreach ($pwdMissing as $item) {
+                $htmlMsg .= '<li style="margin-bottom: 4px;">' . htmlspecialchars($item, ENT_QUOTES, 'UTF-8') . '</li>';
+            }
+            $htmlMsg .= '</ul></div>';
+
+            $result['message'] = $htmlMsg;
             echo json_encode($result, JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $result['message'] = 'Địa chỉ email không đúng định dạng.';
+        if ($repassword === '') {
+            $result['message'] = 'Vui lòng nhập lại mật khẩu vào ô Xác nhận mật khẩu.';
             echo json_encode($result, JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        if (strlen($password) < 6) {
-            $result['message'] = 'Mật khẩu phải có tối thiểu 6 ký tự.';
+        if ($repassword !== $password) {
+            $result['message'] = 'Mật khẩu xác nhận không trùng khớp. Vui lòng kiểm tra lại.';
             echo json_encode($result, JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        if ($repassword !== '' && $repassword !== $password) {
-            $result['message'] = 'Mật khẩu xác nhận không khớp.';
+        $captcha = isset($_POST['captcha']) ? trim($_POST['captcha']) : '';
+        if ($captcha === '') {
+            $result['message'] = 'Vui lòng nhập mã bảo mật Captcha (5 ký tự).';
             echo json_encode($result, JSON_UNESCAPED_UNICODE);
             return;
         }
+
+        if (strlen($captcha) < 5) {
+            $result['message'] = 'Mã Captcha gồm đúng 5 ký tự. Vui lòng nhập đủ 5 ký tự.';
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        $sessCaptcha = isset($_SESSION['security_code']) ? (string)$_SESSION['security_code'] : (isset($_SESSION['captcha']) ? (string)$_SESSION['captcha'] : '');
+        if ($sessCaptcha === '' || strcasecmp($captcha, $sessCaptcha) !== 0) {
+            $result['message'] = 'Mã bảo vệ không chính xác hoặc đã hết hạn. Vui lòng nhập theo mã mới vừa hiển thị.';
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            return;
+        }
+        unset($_SESSION['security_code'], $_SESSION['captcha']);
 
         // Kiểm tra số điện thoại đã tồn tại
         $checkPhone = $db->escapestring($phone);
         $db->query("SELECT id FROM hicrm_users WHERE user_phone = '".$checkPhone."' LIMIT 1");
         if ($db->num_row()) {
-            $result = array('success' => false, 'status' => 409, 'message' => 'Số điện thoại này đã được đăng ký tài khoản. Vui lòng đăng nhập hoặc dùng số khác.');
+            $result = array(
+                'success' => false, 
+                'status'  => 409, 
+                'message' => 'Số điện thoại này đã được đăng ký tài khoản trên hệ thống. Quý khách vui lòng chuyển sang Đăng nhập hoặc sử dụng số khác.'
+            );
             echo json_encode($result, JSON_UNESCAPED_UNICODE);
             return;
         }
@@ -4397,7 +4620,7 @@ Class apiController extends baseController
             $checkEmail = $db->escapestring($email);
             $db->query("SELECT id FROM hicrm_users WHERE user_email = '".$checkEmail."' LIMIT 1");
             if ($db->num_row()) {
-                $result = array('success' => false, 'status' => 409, 'message' => 'Địa chỉ email này đã được sử dụng.');
+                $result = array('success' => false, 'status' => 409, 'message' => 'Địa chỉ email này đã được sử dụng cho một tài khoản khác.');
                 echo json_encode($result, JSON_UNESCAPED_UNICODE);
                 return;
             }
@@ -5794,7 +6017,144 @@ Class apiController extends baseController
 		echo json_encode($result);
 	}
 	//AGENCY API
-	
+
+	// ========================================================
+	// QUẢN LÝ THÔNG TIN KHÁCH HÀNG NHÀ THUỐC
+	// ========================================================
+	public function updateCustomerPharmacy() {
+		global $db;
+		header('Content-Type: application/json; charset=utf-8');
+		if (!(isset($_SESSION['user']['id']) && $_SESSION['user']['id'] != "")) {
+			echo json_encode(array('status' => 403, 'message' => 'Phiên đăng nhập đã hết hạn.'));
+			return;
+		}
+
+		$id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+		$fullname = isset($_POST['fullname']) ? trim($_POST['fullname']) : '';
+		$phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
+		$email = isset($_POST['email']) ? trim($_POST['email']) : '';
+		$address = isset($_POST['address']) ? trim($_POST['address']) : '';
+
+		if ($id <= 0) {
+			echo json_encode(array('status' => 400, 'message' => 'Mã khách hàng không hợp lệ.'));
+			return;
+		}
+		if (mb_strlen($fullname, 'UTF-8') < 2) {
+			echo json_encode(array('status' => 400, 'message' => 'Họ và tên tối thiểu 2 ký tự.'));
+			return;
+		}
+
+		// Chuẩn hóa và kiểm tra số điện thoại
+		$cleanPhone = preg_replace('/[\s.\-]/', '', $phone);
+		$cleanPhone = preg_replace('/^(?:\+84|84)/', '0', $cleanPhone);
+		if ($cleanPhone !== '' && !preg_match('/^0[35789][0-9]{8}$/', $cleanPhone)) {
+			echo json_encode(array('status' => 400, 'message' => 'Số điện thoại không đúng định dạng di động Việt Nam.'));
+			return;
+		}
+
+		// Kiểm tra trùng lặp SĐT với khách hàng khác
+		if ($cleanPhone !== '') {
+			$db->query("SELECT id FROM hicrm_users WHERE user_phone = '".$db->escapestring($cleanPhone)."' AND id != '".$id."' AND user_status != 99 LIMIT 1");
+			if ($db->num_row() > 0) {
+				echo json_encode(array('status' => 400, 'message' => 'Số điện thoại này đã được sử dụng bởi khách hàng khác.'));
+				return;
+			}
+		}
+
+		// Cập nhật thông tin khách hàng
+		$sql = "UPDATE hicrm_users SET 
+			user_fullname = '".$db->escapestring($fullname)."',
+			user_phone = '".$db->escapestring($cleanPhone)."',
+			user_email = '".$db->escapestring($email)."',
+			user_address = '".$db->escapestring($address)."'
+			WHERE id = '".$id."' AND user_group = 0 LIMIT 1";
+		$db->query($sql);
+
+		echo json_encode(array(
+			'status' => 200,
+			'message' => 'Cập nhật thông tin hồ sơ khách hàng thành công!'
+		));
+	}
+
+	public function adjustCustomerPoints() {
+		global $db;
+		header('Content-Type: application/json; charset=utf-8');
+		if (!(isset($_SESSION['user']['id']) && $_SESSION['user']['id'] != "")) {
+			echo json_encode(array('status' => 403, 'message' => 'Phiên đăng nhập đã hết hạn.'));
+			return;
+		}
+
+		$id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+		$action = isset($_POST['action']) ? trim($_POST['action']) : '';
+		$amount = isset($_POST['amount']) ? intval($_POST['amount']) : 0;
+		$reason = isset($_POST['reason']) ? trim($_POST['reason']) : '';
+
+		if ($id <= 0) {
+			echo json_encode(array('status' => 400, 'message' => 'Mã khách hàng không hợp lệ.'));
+			return;
+		}
+		if ($amount <= 0 && $action !== 'set') {
+			echo json_encode(array('status' => 400, 'message' => 'Số điểm điều chỉnh phải lớn hơn 0.'));
+			return;
+		}
+		if (mb_strlen($reason, 'UTF-8') < 3) {
+			echo json_encode(array('status' => 400, 'message' => 'Vui lòng cung cấp lý do điều chỉnh cụ thể.'));
+			return;
+		}
+
+		$db->query("SELECT id, loyalty_points, user_fullname FROM hicrm_users WHERE id = '".$id."' AND user_group = 0 LIMIT 1");
+		$cust = $db->fetch_object(true);
+		if (!$cust) {
+			echo json_encode(array('status' => 404, 'message' => 'Không tìm thấy thông tin khách hàng.'));
+			return;
+		}
+
+		$curPoints = (int)$cust->loyalty_points;
+		$newPoints = $curPoints;
+		if ($action === 'add') {
+			$newPoints = $curPoints + $amount;
+		} elseif ($action === 'deduct') {
+			$newPoints = max(0, $curPoints - $amount);
+		} elseif ($action === 'set') {
+			$newPoints = max(0, $amount);
+		} else {
+			echo json_encode(array('status' => 400, 'message' => 'Hành động không hợp lệ.'));
+			return;
+		}
+
+		$db->query("UPDATE hicrm_users SET loyalty_points = '".$newPoints."' WHERE id = '".$id."' LIMIT 1");
+
+		echo json_encode(array(
+			'status' => 200,
+			'message' => 'Đã cập nhật điểm thành công! Số dư mới: '.number_format($newPoints, 0, ',', '.').' điểm.',
+			'new_points' => $newPoints
+		));
+	}
+
+	public function toggleCustomerStatus() {
+		global $db;
+		header('Content-Type: application/json; charset=utf-8');
+		if (!(isset($_SESSION['user']['id']) && $_SESSION['user']['id'] != "")) {
+			echo json_encode(array('status' => 403, 'message' => 'Phiên đăng nhập đã hết hạn.'));
+			return;
+		}
+
+		$id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+		$status = isset($_POST['status']) ? intval($_POST['status']) : 0;
+
+		if ($id <= 0 || !in_array($status, array(1, 2), true)) {
+			echo json_encode(array('status' => 400, 'message' => 'Dữ liệu không hợp lệ.'));
+			return;
+		}
+
+		$db->query("UPDATE hicrm_users SET user_status = '".$status."' WHERE id = '".$id."' AND user_group = 0 LIMIT 1");
+
+		$statusText = $status === 1 ? 'mở khóa hoạt động' : 'tạm khóa';
+		echo json_encode(array(
+			'status' => 200,
+			'message' => 'Đã '.$statusText.' tài khoản khách hàng thành công!'
+		));
+	}
 }
 
 

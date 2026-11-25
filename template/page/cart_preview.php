@@ -902,25 +902,15 @@ document.addEventListener('DOMContentLoaded', function(){
 
         if (typeof Swal !== 'undefined' && Swal.fire) {
             Swal.fire({
-                toast: true,
-                position: 'top-end',
+                position: 'center',
                 showConfirmButton: false,
                 showCloseButton: false,
-                timer: 2000,
+                timer: 2200,
                 timerProgressBar: true,
                 customClass: {
                     container: 'pk-toast-container',
                     popup: 'pk-toast-card pk-toast-' + iconType,
                     timerProgressBar: 'pk-toast-progress-bar'
-                },
-                didOpen: function(popup){
-                    var container = popup.closest('.swal2-container');
-                    if (container) {
-                        container.style.setProperty('top', pos.top + 'px', 'important');
-                        container.style.setProperty('right', pos.right + 'px', 'important');
-                        container.style.setProperty('bottom', 'auto', 'important');
-                        container.style.setProperty('left', 'auto', 'important');
-                    }
                 },
                 html: '<div class="pk-toast-body">' +
                         '<div class="pk-toast-text-wrap">' +
@@ -1199,7 +1189,7 @@ document.addEventListener('DOMContentLoaded', function(){
             headers: cartHeaders,
             data: {
                 product_id: button.dataset.productId,
-                quantity: 1
+                quantity: (button.dataset && button.dataset.quantity) ? Math.max(1, parseInt(button.dataset.quantity, 10)) : 1
             }
         })
         .done(function(data){

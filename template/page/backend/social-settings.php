@@ -182,13 +182,13 @@ $(function () {
 
     function toast(message, ok) {
         Swal.fire({
-            toast: true,
-            position: 'bottom-end',
+            position: 'center',
             icon: ok ? 'success' : 'error',
             title: message,
-            showConfirmButton: false,
-            timer: 4500,
-            timerProgressBar: true
+            showConfirmButton: !ok,
+            confirmButtonText: 'Đóng',
+            timer: ok ? 2000 : undefined,
+            timerProgressBar: ok
         });
     }
 

@@ -293,9 +293,9 @@
             <div class="copy-flex">
                 <p>&copy; 2026 Bản quyền thuộc về <span>Phòng khám Đa khoa và Nhà thuốc Trường Cao đẳng Kon Tum</span>.</p>
                 <div class="footer-policy-links">
-                    <a href="<?php echo XC_URL;?>/bmi-online/7-do-chi-so-can-nang-chieu-cao-online.html">Đo chỉ số cân nặng - Chiều cao (BMI) online</a><br>
-                    <a href="#">Chính sách bảo mật</a>
-                    <a href="#">Điều khoản sử dụng</a>
+                    <a href="<?php echo XC_URL; ?>/chinhsach/8-chinh-sach-doi-tra-hoan-tien-thuoc.html">Chính sách đổi trả &amp; hoàn tiền</a>
+                    <a href="<?php echo XC_URL; ?>/chinhsach/9-chinh-sach-thanh-toan.html">Chính sách thanh toán</a>
+                    <a href="<?php echo XC_URL; ?>/bmi-online/7-do-chi-so-can-nang-chieu-cao-online.html">Đo chỉ số BMI online</a>
                 </div>
             </div>
         </div>
@@ -468,7 +468,9 @@
 <ul class="sub-menu">
 	<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5152"><a href="<?php echo XC_URL; ?>/gioi-thieu/5-gioi-thieu-nha-thuoc.html">Giới thiệu nhà thuốc</a></li>
 	<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5152"><a href="<?php echo XC_URL; ?>/nha-thuoc.html">Danh mục sản phẩm</a></li>
-  <li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5152"><a href="<?php echo XC_URL; ?>/gioi-thieu/6-chinh-sach-ban-hang.html">Chính sách bán hàng</a></li>
+  <li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5152"><a href="<?php echo XC_URL; ?>/chinhsach/6-chinh-sach-ban-hang.html">Chính sách bán hàng</a></li>
+  <li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5152"><a href="<?php echo XC_URL; ?>/chinhsach/8-chinh-sach-doi-tra-hoan-tien-thuoc.html">Chính sách đổi trả &amp; hoàn tiền</a></li>
+  <li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5152"><a href="<?php echo XC_URL; ?>/chinhsach/9-chinh-sach-thanh-toan.html">Chính sách thanh toán</a></li>
 </ul>
 	
 </li>
@@ -533,7 +535,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
-<script type='text/javascript' src='<?php echo $template_path; ?>/assets/themes/dkcd/a/all4bf4.js?ver=1.0.3'></script>
+<script type='text/javascript' src='<?php echo $template_path; ?>/assets/themes/dkcd/a/all4bf4.js?v=<?php echo time(); ?>'></script>
 <script type='text/javascript' src='<?php echo $template_path; ?>/assets/themes/dkcd/a/boai_show_popup9632.js?ver=1.2.3'></script>
 <script type='text/javascript' src='<?php echo $template_path; ?>/assets/wpcomp-quiz/assets/js/script.js'></script>
 <script type='text/javascript'>
@@ -554,6 +556,25 @@ var wpminiHsinjectorSettings = {"initial_delay":"10000","notification_duration":
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script type="text/javascript">
     jQuery(function($) {
+      $('#slider .slider').each(function() {
+        var $sl = $(this);
+        if (!$sl.hasClass('slick-initialized')) {
+          $sl.slick({
+            dots: true,
+            arrows: true,
+            fade: true,
+            infinite: true,
+            speed: 500,
+            autoplay: true,
+            autoplaySpeed: 5000,
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            adaptiveHeight: false,
+            prevArrow: '<button type="button" class="slick_arrow sbanner_prev" aria-label="Slide trước"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>',
+            nextArrow: '<button type="button" class="slick_arrow sbanner_next" aria-label="Slide tiếp theo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>'
+          });
+        }
+      });
       $('#sec2Wrp,#phbnWrp').slick({
         lazyLoad: 'ondemand',
         infinite: true,
